@@ -134,3 +134,6 @@ test.py
 .vscode/
 target
 data
+*.grib
+*.grib2
+?

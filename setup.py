@@ -39,7 +39,7 @@ setuptools.setup(
     author_email="software.support@ecmwf.int",
     license="Apache License Version 2.0",
     url="https://github.com/ecmwf/ecmwf-opendata",
-    packages=setuptools.find_namespace_packages(include=['ecmwf.*']),
+    packages=setuptools.find_namespace_packages(include=["ecmwf.*"]),
     include_package_data=True,
     install_requires=["multiurl"],
     zip_safe=True,
