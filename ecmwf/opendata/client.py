@@ -7,14 +7,15 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 #
-import datetime
+
 import itertools
+import json
 import logging
 import os
 import re
-import json
+
 import requests
-from multiurl import download
+from multiurl import download, robust
 
 from .date import fulldate
 
@@ -101,19 +102,19 @@ class Client:
             base, _ = os.path.splitext(url)
             index_url = f"{base}.index"
 
-            r = requests.get(index_url)
+            r = robust(requests.get)(index_url)
             r.raise_for_status()
-
 
             parts = []
             for line in r.iter_lines():
                 line = json.loads(line)
+                # LOG.debug(line)
                 matches = 0
                 for name, values in for_index.items():
-                    if line[name] in values:
-                        matches +=1
+                    if line.get(name) in values:
+                        matches += 1
                 if matches == count:
-                    parts.append((line['_offset'], line['_length']))
+                    parts.append((line["_offset"], line["_length"]))
 
             if parts:
                 result.append((url, parts))

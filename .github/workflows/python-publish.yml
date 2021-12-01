@@ -65,7 +65,7 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Check that tag version matches climetlab version
+    - name: Check that tag version matches code version
       run: |
           tag=${GITHUB_REF#refs/tags/}
           version=$(python setup.py --version)
