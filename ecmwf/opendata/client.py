@@ -85,7 +85,6 @@ class Client:
                 data_urls.append(url)
                 seen.add(url)
 
-        print(data_urls)
         if for_index:
             data_urls = self.get_parts(data_urls, for_index)
 
@@ -93,7 +92,6 @@ class Client:
         download(data_urls, target=target)
 
     def get_parts(self, data_urls, for_index):
-        print(for_index)
 
         count = len(for_index)
         result = []
