@@ -28,9 +28,10 @@ PATTERN = (
 
 
 class Client:
-    def __init__(self, url, pattern=PATTERN):
+    def __init__(self, url, pattern=PATTERN, beta=False):
         self.url = url
         self.pattern = pattern
+        self.beta = beta
 
         self.url_components = {"date", "time"}
 
@@ -47,7 +48,7 @@ class Client:
 
         params = dict(
             _url=self.url,
-            resol="0p4",
+            resol="0p4-beta" if self.beta else "0p4",
             stream="oper",
             type="fc",
             date=-1,
