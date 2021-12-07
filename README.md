@@ -4,7 +4,7 @@ A package to download ECMWF open data
 
 ```python    
 
-fromecmwf.opendataimportClient
+from ecmwf.opendata import Client
 
 client = Client("https://....")
 
