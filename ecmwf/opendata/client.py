@@ -26,10 +26,23 @@ PATTERN = (
     "{_yyyymmddHHMMSS}-{step}h-{stream}-{type}.grib2"
 )
 
+TYPE_MAPPING = {
+    "cf": "ef",
+    "pf": "ef",
+    "em": "ep",
+    "es": "ep",
+}
+step_mapping = {}
+step_mapping.update({str(x): "240" for x in range(0, 241)})
+step_mapping.update({str(x): "360" for x in range(240, 361)})
+
+STEP_MAPPING = {}
+STEP_MAPPING["em"] = STEP_MAPPING["es"] = STEP_MAPPING["ep"] = step_mapping
+
 
 class Client:
-    def __init__(self, url, pattern=PATTERN, beta=False):
-        self.url = url
+    def __init__(self, url=None, pattern=PATTERN, beta=True):
+        self.url = url if url is not None else os.environ["ECMWF_OPENDATA_URL"]
         self.pattern = pattern
         self.beta = beta
 
@@ -68,7 +81,9 @@ class Client:
             if not k.startswith("_") and k not in self.url_components:
                 for_index[k] = set([str(x) for x in v])
             else:
-                for_urls[k] = v
+                for_urls[k] = [str(x) for x in v]
+
+        self.patch(for_index, for_urls)
 
         params = None
 
@@ -107,7 +122,6 @@ class Client:
             parts = []
             for line in r.iter_lines():
                 line = json.loads(line)
-                # LOG.debug(line)
                 matches = 0
                 for name, values in for_index.items():
                     if line.get(name) in values:
@@ -117,4 +131,24 @@ class Client:
 
             if parts:
                 result.append((url, parts))
+
+        assert len(result) > 0
         return result
+
+    def patch(self, for_index, for_urls):
+        def step(p):
+            if isinstance(p, str):
+                return p.split("-")[-1]
+            return str(p)
+
+        assert len(for_urls["type"]) == 1, (
+            for_urls["type"],
+            len(for_urls["type"]),
+        )  # For now
+
+        for_index["step"] = for_urls["step"]
+        for_urls["step"] = [
+            STEP_MAPPING[for_urls["type"][0]][step(t)] for t in for_urls["step"]
+        ]
+        for_index["type"] = for_urls["type"]
+        for_urls["type"] = [TYPE_MAPPING.get(t, t) for t in for_urls["type"]]

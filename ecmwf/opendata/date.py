@@ -27,6 +27,12 @@ def fulldate(date, time=None):
 
     if isinstance(date, str):
 
+        try:
+            if len(date) > 0 and date[0] == "-":
+                return fulldate(int(date), time)
+        except ValueError:
+            pass
+
         if VALID_DATE.match(date):
             date = datetime.datetime.fromisoformat(date)
 

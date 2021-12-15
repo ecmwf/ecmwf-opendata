@@ -50,6 +50,8 @@ jobs:
 
       - name: Tests
         run: pytest
+        env:
+          ECMWF_OPENDATA_URL: ${{ secrets.ECMWF_OPENDATA_URL }}
 
   deploy:
 
