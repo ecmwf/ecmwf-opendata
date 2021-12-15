@@ -26,18 +26,21 @@ PATTERN = (
     "{_yyyymmddHHMMSS}-{step}h-{stream}-{type}.grib2"
 )
 
-TYPE_MAPPING = {
+URL_TYPE_MAPPING = {
     "cf": "ef",
     "pf": "ef",
     "em": "ep",
     "es": "ep",
 }
+
+INDEX_TYPE_MAPPING = {"ef": ["cf", "pf"]}
+
 step_mapping = {}
 step_mapping.update({str(x): "240" for x in range(0, 241)})
 step_mapping.update({str(x): "360" for x in range(240, 361)})
 
-STEP_MAPPING = {}
-STEP_MAPPING["em"] = STEP_MAPPING["es"] = STEP_MAPPING["ep"] = step_mapping
+URL_STEP_MAPPING = {}
+URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_mapping
 
 
 class Client:
@@ -147,8 +150,14 @@ class Client:
         )  # For now
 
         for_index["step"] = for_urls["step"]
-        for_urls["step"] = [
-            STEP_MAPPING[for_urls["type"][0]][step(t)] for t in for_urls["step"]
-        ]
-        for_index["type"] = for_urls["type"]
-        for_urls["type"] = [TYPE_MAPPING.get(t, t) for t in for_urls["type"]]
+
+        if for_urls["type"][0] in URL_STEP_MAPPING:
+            for_urls["step"] = [
+                URL_STEP_MAPPING[for_urls["type"][0]][step(t)] for t in for_urls["step"]
+            ]
+
+        for_index["type"] = INDEX_TYPE_MAPPING.get(
+            for_urls["type"][0], for_urls["type"]
+        )
+
+        for_urls["type"] = [URL_TYPE_MAPPING.get(t, t) for t in for_urls["type"]]
