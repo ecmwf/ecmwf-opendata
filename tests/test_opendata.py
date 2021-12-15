@@ -12,14 +12,6 @@ def get(f, count):
     return n
 
 
-def at(self, index, count=1):
-    here = self.tell()
-    self.seek(self.offset + index)
-    n = get(f, count)
-    self.seek(here)
-    return n
-
-
 def count_gribs(path):
     count = 0
     with open(path, "rb") as f:
