@@ -23,7 +23,7 @@ LOG = logging.getLogger(__name__)
 
 PATTERN = (
     "{_url}/{_yyyymmdd}/{_H}z/{resol}/{stream}/"
-    "{_yyyymmddHHMMSS}-{step}h-{stream}-{type}.grib2"
+    "{_yyyymmddHHMMSS}-{step}{_U}-{stream}-{type}.grib2"
 )
 
 URL_TYPE_MAPPING = {
@@ -31,9 +31,16 @@ URL_TYPE_MAPPING = {
     "pf": "ef",
     "em": "ep",
     "es": "ep",
+    "fcmean": "fc",
+}
+
+URL_STREAM_MAPPING = {
+    "mmsa": "mmsf",
 }
 
 INDEX_TYPE_MAPPING = {"ef": ["cf", "pf"]}
+
+STEP_NAME = {"mmsa": "fcmonth"}
 
 step_mapping = {}
 step_mapping.update({str(x): "240" for x in range(0, 241)})
@@ -99,6 +106,7 @@ class Client:
             args["_yyyymmdd"] = date.strftime("%Y%m%d")
             args["_H"] = date.strftime("%H")
             args["_yyyymmddHHMMSS"] = date.strftime("%Y%m%d%H%M%S")
+            args["_U"] = "h"
             url = self.pattern.format(**args)
             if url not in seen:
                 data_urls.append(url)
@@ -161,3 +169,4 @@ class Client:
         )
 
         for_urls["type"] = [URL_TYPE_MAPPING.get(t, t) for t in for_urls["type"]]
+        for_urls["stream"] = [URL_STREAM_MAPPING.get(s, s) for s in for_urls["stream"]]

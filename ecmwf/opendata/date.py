@@ -10,7 +10,7 @@
 import datetime
 import re
 
-VALID_DATE = re.compile(r"\d\d\d\d-?\d\d-?\d\d([T\s]\d\d:\d\d(:\d\d)?)?Z?")
+VALID_DATE = re.compile(r"\d\d\d\d-\d\d-\d\d([T\s]\d\d:\d\d(:\d\d)?)?Z?")
 
 
 def fulldate(date, time=None):
@@ -28,8 +28,7 @@ def fulldate(date, time=None):
     if isinstance(date, str):
 
         try:
-            if len(date) > 0 and date[0] == "-":
-                return fulldate(int(date), time)
+            return fulldate(int(date), time)
         except ValueError:
             pass
 
@@ -37,10 +36,12 @@ def fulldate(date, time=None):
             date = datetime.datetime.fromisoformat(date)
 
     if not isinstance(date, datetime.datetime):
-        raise ValueError("Invalid date: {}".format(date))
+        raise ValueError("Invalid date: {} ({})".format(date, type(date)))
 
     if time is not None:
         time = int(time)
+        if time >= 100:
+            time //= 100
         date = datetime.datetime(date.year, date.month, date.day, time, 0, 0)
 
     return date

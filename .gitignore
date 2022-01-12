@@ -138,3 +138,9 @@ data
 *.grib2
 ?
 *.download
+*.index
+*.txt
+*.py
+!setup.py
+!tests/*.py
+!ecmwf/**/*.py
