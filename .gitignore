@@ -144,3 +144,5 @@ data
 !setup.py
 !tests/*.py
 !ecmwf/**/*.py
+test.*
+*.bufr
