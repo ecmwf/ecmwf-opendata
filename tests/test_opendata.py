@@ -1,4 +1,3 @@
-import datetime
 import os
 
 import pytest
@@ -49,7 +48,7 @@ def count_gribs(path):
 def test_opendata_1():
     client = Client()
     client.retrieve(
-        date=-2,
+        date=-1,
         time=0,
         step="144-168",
         stream="enfo",
@@ -69,7 +68,7 @@ def test_opendata_1():
 def test_opendata_2():
     client = Client()
     client.retrieve(
-        date=-2,
+        date=-1,
         time=0,
         step=12,
         stream="enfo",
@@ -89,7 +88,7 @@ def test_opendata_2():
 def test_opendata_3():
     client = Client()
     client.retrieve(
-        date=-2,
+        date=-1,
         time=0,
         step=12,
         stream="enfo",
@@ -109,7 +108,7 @@ def test_opendata_3():
 def test_opendata_4():
     client = Client()
     client.retrieve(
-        date=-2,
+        date=-1,
         time=0,
         step=12,
         stream="enfo",
@@ -122,24 +121,24 @@ def test_opendata_4():
     assert count_gribs("data.grib") == 50
 
 
-@pytest.mark.skipif(
-    "ECMWF_OPENDATA_URL" not in os.environ,
-    reason="ECMWF_OPENDATA_URL not in os.environ",
-)
-def test_opendata_5():
-    client = Client()
-    now = datetime.datetime.utcnow() - datetime.timedelta(days=13)
-    client.retrieve(
-        date=now.year * 10000 + now.month * 100 + 1,
-        time=0,
-        stream="mmsa",
-        type="fcmean",
-        levtype="sfc",
-        fcmonth="1",
-        target="data.grib",
-    )
+# @pytest.mark.skipif(
+#     "ECMWF_OPENDATA_URL" not in os.environ,
+#     reason="ECMWF_OPENDATA_URL not in os.environ",
+# )
+# def test_opendata_5():
+#     client = Client()
+#     now = datetime.datetime.utcnow() - datetime.timedelta(days=13)
+#     client.retrieve(
+#         date=now.year * 10000 + now.month * 100 + 1,
+#         time=0,
+#         stream="mmsa",
+#         type="fcmean",
+#         levtype="sfc",
+#         fcmonth="1",
+#         target="data.grib",
+#     )
 
-    assert count_gribs("data.grib") == 51
+#     assert count_gribs("data.grib") == 51
 
 
 @pytest.mark.skipif(
@@ -148,6 +147,24 @@ def test_opendata_5():
 )
 def test_opendata_6():
     client = Client()
+    client.retrieve(
+        date=-1,
+        time=0,
+        type="tf",
+        step=240,
+        target="data.bufr",
+    )
+
+    with open("data.bufr", "rb") as f:
+        assert f.read(4) == b"BUFR"
+
+
+@pytest.mark.skipif(
+    "ECMWF_OPENDATA_URL" not in os.environ,
+    reason="ECMWF_OPENDATA_URL not in os.environ",
+)
+def test_order():
+    client = Client(preserve_request_order=True)
     client.retrieve(
         date=-1,
         time=0,

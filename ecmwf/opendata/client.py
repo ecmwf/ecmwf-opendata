@@ -60,25 +60,31 @@ URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_
 
 
 class Client:
-    def __init__(self, url=None, beta=True):
+    def __init__(self, url=None, beta=True, preserve_request_order=False):
         self.url = url if url is not None else os.environ["ECMWF_OPENDATA_URL"]
         self.beta = beta
+        self.preserve_request_order = preserve_request_order
 
     def retrieve(self, request=None, target=None, **kwargs):
         if request is None:
-            request = {}
+            params = dict(**kwargs)
+        else:
+            params = dict(**request)
 
-        params = dict(
-            _url=self.url,
+        defaults = dict(
             resol="0p4-beta" if self.beta else "0p4",
-            stream="oper",
             type="fc",
+            stream="oper",
             date=-1,
             step=0,
             fcmonth=1,
         )
-        params.update(request)
-        params.update(kwargs)
+
+        for key, value in defaults.items():
+            params.setdefault(key, value)
+
+        params["_url"] = self.url
+
         params["extension"] = EXTENSIONS.get(params["type"], "grib2")
 
         if target is None:
@@ -103,9 +109,11 @@ class Client:
             if not isinstance(v, (list, tuple)):
                 v = [v]
             if not k.startswith("_") and k not in url_components:
-                for_index[k] = set([str(x) for x in v])
+                for_index[k] = [str(x) for x in v]
+                assert len(set(for_index[k])) == len(for_index[k])
             else:
                 for_urls[k] = [str(x) for x in v]
+                assert len(set(for_urls[k])) == len(for_urls[k])
 
         self.patch(for_index, for_urls)
 
@@ -116,6 +124,7 @@ class Client:
         for args in (
             dict(zip(for_urls.keys(), x)) for x in itertools.product(*for_urls.values())
         ):
+            print(args)
             date = fulldate(args.pop("date", None), args.pop("time", None))
             args["_yyyymmdd"] = date.strftime("%Y%m%d")
             args["_H"] = date.strftime("%H")
@@ -133,6 +142,8 @@ class Client:
 
     def get_parts(self, data_urls, for_index):
 
+        print(for_index)
+
         count = len(for_index)
         result = []
         line = None
@@ -147,15 +158,22 @@ class Client:
             parts = []
             for line in r.iter_lines():
                 line = json.loads(line)
-                matches = 0
-                for name, values in for_index.items():
-                    if line.get(name) in values:
-                        matches += 1
-                if matches == count:
-                    parts.append((line["_offset"], line["_length"]))
+                matches = []
+                for i, (name, values) in enumerate(for_index.items()):
+                    idx = line.get(name)
+                    if idx in values:
+                        if self.preserve_request_order:
+                            for j, v in enumerate(values):
+                                if v == idx:
+                                    matches.append((i, j))
+                        else:
+                            matches.append(line["_offset"])
+
+                if len(matches) == count:
+                    parts.append((tuple(matches), (line["_offset"], line["_length"])))
 
             if parts:
-                result.append((url, parts))
+                result.append((url, tuple(p[1] for p in sorted(parts))))
 
         assert len(result) > 0, (for_index, line)
         return result
