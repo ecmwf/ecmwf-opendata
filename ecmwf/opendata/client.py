@@ -8,6 +8,7 @@
 # nor does it submit to any jurisdiction.
 #
 
+import datetime
 import itertools
 import json
 import logging
@@ -41,6 +42,7 @@ URL_TYPE_MAPPING = {
 
 URL_STREAM_MAPPING = {
     "mmsa": "mmsf",
+    # "wave": "oper",
 }
 
 
@@ -58,14 +60,75 @@ step_mapping.update({str(x): "360" for x in range(240, 361)})
 URL_STEP_MAPPING = {}
 URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_mapping
 
+URLS = {}
+
 
 class Client:
-    def __init__(self, url=None, beta=True, preserve_request_order=False):
-        self.url = url if url is not None else os.environ["ECMWF_OPENDATA_URL"]
+    def __init__(
+        self,
+        source="ecmwf",
+        url=None,
+        beta=True,
+        preserve_request_order=False,
+    ):
+        self._url = url if url is None else os.environ.get("ECMWF_OPENDATA_URL")
+        self.source = source
         self.beta = beta
         self.preserve_request_order = preserve_request_order
 
+    @property
+    def url(self):
+
+        if self._url is None:
+
+            if self.source.startswith("http://") or self.source.startswith("https://"):
+                self._url = self.source
+            else:
+                self._url = URLS.get(self.source, self.source)
+
+        return self._url
+
     def retrieve(self, request=None, target=None, **kwargs):
+        data_urls, target = self._get_urls(
+            request,
+            target=target,
+            use_index=True,
+            **kwargs,
+        )
+        print(data_urls)
+        download(data_urls, target=target)
+
+    def latest(self, request=None, **kwargs):
+        if request is None:
+            params = dict(**kwargs)
+        else:
+            params = dict(**request)
+        if "time" not in params:
+            delta = datetime.timedelta(hours=6)
+        else:
+            delta = datetime.timedelta(days=1)
+        date = fulldate(0, params.get("time"))
+        stop = date - datetime.timedelta(days=1, hours=6)
+        while date > stop:
+            data_urls, _ = self._get_urls(
+                request=None,
+                use_index=False,
+                date=date,
+                **params,
+            )
+            codes = [robust(requests.head)(url).status_code for url in data_urls]
+            print(codes)
+            if len(codes) > 0 and all(c == 200 for c in codes):
+                if "time" not in params:
+                    return date
+                else:
+                    return datetime.date(date.year, date.month, date.day)
+            date -= delta
+
+        raise ValueError(f"Cannot etablish latest date for {params}")
+
+    def _get_urls(self, request=None, use_index=None, target=None, **kwargs):
+        assert use_index in (True, False)
         if request is None:
             params = dict(**kwargs)
         else:
@@ -75,13 +138,15 @@ class Client:
             resol="0p4-beta" if self.beta else "0p4",
             type="fc",
             stream="oper",
-            date=-1,
             step=0,
             fcmonth=1,
         )
 
         for key, value in defaults.items():
             params.setdefault(key, value)
+
+        if "date" not in params:
+            params["date"] = self.latest(params)
 
         params["_url"] = self.url
 
@@ -134,11 +199,10 @@ class Client:
                 data_urls.append(url)
                 seen.add(url)
 
-        if for_index:
+        if for_index and use_index:
             data_urls = self.get_parts(data_urls, for_index)
 
-        assert target is not None
-        download(data_urls, target=target)
+        return data_urls, target
 
     def get_parts(self, data_urls, for_index):
 
@@ -151,7 +215,6 @@ class Client:
         for url in data_urls:
             base, _ = os.path.splitext(url)
             index_url = f"{base}.index"
-
             r = robust(requests.get)(index_url)
             r.raise_for_status()
 

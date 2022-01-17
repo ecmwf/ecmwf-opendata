@@ -19,7 +19,7 @@ def fulldate(date, time=None):
         date = datetime.datetime(date.year, date.month, date.day)
 
     if isinstance(date, int):
-        if date < 0:
+        if date <= 0:
             date = datetime.datetime.utcnow() + datetime.timedelta(days=date)
             date = datetime.datetime(date.year, date.month, date.day)
         else:
