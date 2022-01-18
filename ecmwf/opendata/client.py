@@ -60,7 +60,9 @@ step_mapping.update({str(x): "360" for x in range(240, 361)})
 URL_STEP_MAPPING = {}
 URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_mapping
 
-URLS = {}
+URLS = {
+    "ecmwf": "https://opendata:opendata@dissemination.ecmwf.int/ecpds/data/file/EGS"
+}
 
 
 class Client:
@@ -95,7 +97,7 @@ class Client:
             use_index=True,
             **kwargs,
         )
-        print(data_urls)
+        # print(data_urls)
         download(data_urls, target=target)
 
     def latest(self, request=None, **kwargs):
@@ -117,7 +119,7 @@ class Client:
                 **params,
             )
             codes = [robust(requests.head)(url).status_code for url in data_urls]
-            print(codes)
+            # print(codes)
             if len(codes) > 0 and all(c == 200 for c in codes):
                 if "time" not in params:
                     return date
@@ -189,7 +191,7 @@ class Client:
         for args in (
             dict(zip(for_urls.keys(), x)) for x in itertools.product(*for_urls.values())
         ):
-            print(args)
+            # print(args)
             date = fulldate(args.pop("date", None), args.pop("time", None))
             args["_yyyymmdd"] = date.strftime("%Y%m%d")
             args["_H"] = date.strftime("%H")
@@ -206,7 +208,7 @@ class Client:
 
     def get_parts(self, data_urls, for_index):
 
-        print(for_index)
+        # print(for_index)
 
         count = len(for_index)
         result = []
