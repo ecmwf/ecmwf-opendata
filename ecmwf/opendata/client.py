@@ -61,7 +61,6 @@ URL_STEP_MAPPING = {}
 URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_mapping
 
 URLS = {
-    "ecmwf": "https://opendata:opendata@dissemination.ecmwf.int/ecpds/data/file/EGS",
 }
 
 
