@@ -63,7 +63,6 @@ URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_
 URLS = {
 }
 
-
 class Client:
     def __init__(
         self,
