@@ -60,8 +60,8 @@ step_mapping.update({str(x): "360" for x in range(240, 361)})
 URL_STEP_MAPPING = {}
 URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_mapping
 
-URLS = {
-}
+URLS = {}
+
 
 class Client:
     def __init__(
@@ -78,12 +78,16 @@ class Client:
 
     @property
     def url(self):
+        global URLS
 
         if self._url is None:
 
             if self.source.startswith("http://") or self.source.startswith("https://"):
                 self._url = self.source
             else:
+                if not URLS:
+                    with open(os.path.expanduser("~/.ecmwf-opendata")) as f:
+                        URLS = json.load(f)
                 self._url = URLS.get(self.source, self.source)
 
         return self._url
