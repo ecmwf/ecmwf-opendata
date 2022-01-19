@@ -86,8 +86,10 @@ class Client:
                 self._url = self.source
             else:
                 if not URLS:
-                    with open(os.path.expanduser("~/.ecmwf-opendata")) as f:
-                        URLS = json.load(f)
+                    dotfile = os.path.expanduser("~/.ecmwf-opendata")
+                    if os.path.exists(dotfile):
+                        with open(dotfile) as f:
+                            URLS = json.load(f)
                 self._url = URLS.get(self.source, self.source)
 
         return self._url
