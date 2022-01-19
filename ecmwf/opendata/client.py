@@ -71,7 +71,7 @@ class Client:
         beta=True,
         preserve_request_order=False,
     ):
-        self._url = url if url is None else os.environ.get("ECMWF_OPENDATA_URL")
+        self._url = url if url is not None else os.environ.get("ECMWF_OPENDATA_URL")
         self.source = source
         self.beta = beta
         self.preserve_request_order = preserve_request_order

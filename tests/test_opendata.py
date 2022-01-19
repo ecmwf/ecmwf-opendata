@@ -121,26 +121,6 @@ def test_opendata_4():
     assert count_gribs("data.grib") == 50
 
 
-# @pytest.mark.skipif(
-#     "ECMWF_OPENDATA_URL" not in os.environ,
-#     reason="ECMWF_OPENDATA_URL not in os.environ",
-# )
-# def test_opendata_5():
-#     client = Client()
-#     now = datetime.datetime.utcnow() - datetime.timedelta(days=13)
-#     client.retrieve(
-#         date=now.year * 10000 + now.month * 100 + 1,
-#         time=0,
-#         stream="mmsa",
-#         type="fcmean",
-#         levtype="sfc",
-#         fcmonth="1",
-#         target="data.grib",
-#     )
-
-#     assert count_gribs("data.grib") == 51
-
-
 @pytest.mark.skipif(
     "ECMWF_OPENDATA_URL" not in os.environ,
     reason="ECMWF_OPENDATA_URL not in os.environ",
@@ -151,24 +131,7 @@ def test_opendata_6():
         date=-1,
         time=0,
         type="tf",
-        step=240,
-        target="data.bufr",
-    )
-
-    with open("data.bufr", "rb") as f:
-        assert f.read(4) == b"BUFR"
-
-
-@pytest.mark.skipif(
-    "ECMWF_OPENDATA_URL" not in os.environ,
-    reason="ECMWF_OPENDATA_URL not in os.environ",
-)
-def test_order():
-    client = Client(preserve_request_order=True)
-    client.retrieve(
-        date=-1,
-        time=0,
-        type="tf",
+        stream="enfo",
         step=240,
         target="data.bufr",
     )
