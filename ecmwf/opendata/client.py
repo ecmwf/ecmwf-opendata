@@ -116,6 +116,7 @@ class Client:
         date = fulldate(0, params.get("time"))
         stop = date - datetime.timedelta(days=1, hours=6)
         while date > stop:
+            print("\nTRY DATE", date)
             data_urls, _ = self._get_urls(
                 request=None,
                 use_index=False,
@@ -123,7 +124,7 @@ class Client:
                 **params,
             )
             codes = [robust(requests.head)(url).status_code for url in data_urls]
-            # print(codes)
+            print("CODES", codes)
             if len(codes) > 0 and all(c == 200 for c in codes):
                 if "time" not in params:
                     return date
