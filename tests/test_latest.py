@@ -7,7 +7,7 @@ from ecmwf.opendata import Client
 TEST_URL = "https://get.ecmwf.int/repository/ecmwf-opendata/testing"
 
 
-@freeze_time("2022-01-21 13:21:34")
+@freeze_time("2022-01-21T13:21:34Z")
 def test_latest_1():
     client = Client(TEST_URL)
     date = client.latest(

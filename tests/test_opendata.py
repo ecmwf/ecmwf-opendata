@@ -41,7 +41,7 @@ def count_gribs(path):
     return count
 
 
-@freeze_time("2022-01-21 13:21:34")
+@freeze_time("2022-01-21T13:21:34Z")
 def xx_test_opendata_1():
     client = Client(TEST_URL)
     client.retrieve(
@@ -58,7 +58,7 @@ def xx_test_opendata_1():
     assert count_gribs("data.grib") == 1
 
 
-@freeze_time("2022-01-21 13:21:34")
+@freeze_time("2022-01-21T13:21:34Z")
 def test_opendata_2():
     client = Client(TEST_URL)
     client.retrieve(
@@ -75,7 +75,7 @@ def test_opendata_2():
     assert count_gribs("data.grib") == 51
 
 
-@freeze_time("2022-01-21 13:21:34")
+@freeze_time("2022-01-21T13:21:34Z")
 def test_opendata_3():
     client = Client(TEST_URL)
     client.retrieve(
@@ -92,7 +92,7 @@ def test_opendata_3():
     assert count_gribs("data.grib") == 1
 
 
-@freeze_time("2022-01-21 13:21:34")
+@freeze_time("2022-01-21T13:21:34Z")
 def test_opendata_4():
     client = Client(TEST_URL)
     client.retrieve(
@@ -109,7 +109,7 @@ def test_opendata_4():
     assert count_gribs("data.grib") == 50
 
 
-@freeze_time("2022-01-21 13:21:34")
+@freeze_time("2022-01-21T13:21:34Z")
 def xx_test_opendata_6():
     client = Client(TEST_URL)
     client.retrieve(
