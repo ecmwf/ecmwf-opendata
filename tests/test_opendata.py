@@ -4,6 +4,8 @@ import pytest
 
 from ecmwf.opendata import Client
 
+TEST_URL = "https://get.ecmwf.int/repository/ecmwf-opendata/testing"
+
 
 def get(f, count):
     n = 0
@@ -41,12 +43,8 @@ def count_gribs(path):
     return count
 
 
-@pytest.mark.skipif(
-    "ECMWF_OPENDATA_URL" not in os.environ,
-    reason="ECMWF_OPENDATA_URL not in os.environ",
-)
 def test_opendata_1():
-    client = Client()
+    client = Client(TEST_URL)
     client.retrieve(
         date=-1,
         time=0,
@@ -61,12 +59,8 @@ def test_opendata_1():
     assert count_gribs("data.grib") == 1
 
 
-@pytest.mark.skipif(
-    "ECMWF_OPENDATA_URL" not in os.environ,
-    reason="ECMWF_OPENDATA_URL not in os.environ",
-)
 def test_opendata_2():
-    client = Client()
+    client = Client(TEST_URL)
     client.retrieve(
         date=-1,
         time=0,
@@ -81,11 +75,7 @@ def test_opendata_2():
     assert count_gribs("data.grib") == 51
 
 
-@pytest.mark.skipif(
-    "ECMWF_OPENDATA_URL" not in os.environ,
-    reason="ECMWF_OPENDATA_URL not in os.environ",
-)
-def test_opendata_3():
+def test_opendata_3(TEST_URL):
     client = Client()
     client.retrieve(
         date=-1,
@@ -101,12 +91,8 @@ def test_opendata_3():
     assert count_gribs("data.grib") == 1
 
 
-@pytest.mark.skipif(
-    "ECMWF_OPENDATA_URL" not in os.environ,
-    reason="ECMWF_OPENDATA_URL not in os.environ",
-)
 def test_opendata_4():
-    client = Client()
+    client = Client(TEST_URL)
     client.retrieve(
         date=-1,
         time=0,
@@ -121,12 +107,8 @@ def test_opendata_4():
     assert count_gribs("data.grib") == 50
 
 
-@pytest.mark.skipif(
-    "ECMWF_OPENDATA_URL" not in os.environ,
-    reason="ECMWF_OPENDATA_URL not in os.environ",
-)
 def test_opendata_6():
-    client = Client()
+    client = Client(TEST_URL)
     client.retrieve(
         date=-1,
         time=0,

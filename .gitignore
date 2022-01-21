@@ -141,8 +141,14 @@ data
 *.index
 *.txt
 *.py
+*.sh
+*.out
+*.1
 !setup.py
 !tests/*.py
 !ecmwf/**/*.py
 test.*
 *.bufr
+!tools/**/*.py
+done
+*.raw
