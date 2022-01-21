@@ -17,8 +17,8 @@ def test_utc_2():
     assert datetime.datetime.utcnow() == datetime.datetime(2022, 1, 21, 13, 21, 34)
 
 
-@freeze_time("2022-01-21 13:21:34", tz_offset=0)
-def xxx_est_latest_1():
+@freeze_time("2022-01-21T13:21:34Z")
+def test_latest_1():
     client = Client(TEST_URL)
     date = client.latest(
         time=0,
@@ -29,7 +29,7 @@ def xxx_est_latest_1():
         param="2t",
         target="data.grib",
     )
-
+    print(date, type(date), datetime.date(2022, 1, 20), type(datetime.date(2022, 1, 20)))
     assert date == datetime.date(2022, 1, 20)
 
 
@@ -105,5 +105,5 @@ def xxx_est_latest_1():
 #     assert date == datetime.date(2022, 1, 18)
 
 
-# if __name__ == "__main__":
-#     test_latest_1()
+if __name__ == "__main__":
+    test_latest_1()
