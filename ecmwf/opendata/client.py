@@ -60,7 +60,10 @@ step_mapping.update({str(x): "360" for x in range(240, 361)})
 URL_STEP_MAPPING = {}
 URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_mapping
 
-URLS = {}
+URLS = {
+    "ecmwf": "https://dissemination.ecmwf.int/ecpds/home/opendata",
+    "azure": "https://ai4edataeuwest.blob.core.windows.net/ecmwf",
+}
 
 
 class Client:
@@ -71,7 +74,7 @@ class Client:
         beta=True,
         preserve_request_order=False,
     ):
-        self._url = url if url is not None else os.environ.get("ECMWF_OPENDATA_URL")
+        self._url = url
         self.source = source
         self.beta = beta
         self.preserve_request_order = preserve_request_order
@@ -85,12 +88,7 @@ class Client:
             if self.source.startswith("http://") or self.source.startswith("https://"):
                 self._url = self.source
             else:
-                if not URLS:
-                    dotfile = os.path.expanduser("~/.ecmwf-opendata")
-                    if os.path.exists(dotfile):
-                        with open(dotfile) as f:
-                            URLS = json.load(f)
-                self._url = URLS.get(self.source, self.source)
+                self._url = URLS[self.source]
 
         return self._url
 
