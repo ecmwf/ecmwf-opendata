@@ -8,7 +8,17 @@ TEST_URL = "https://get.ecmwf.int/repository/ecmwf-opendata/testing"
 
 
 @freeze_time("2022-01-21 13:21:34", tz_offset=0)
-def test_latest_1():
+def test_utc_1():
+    assert datetime.datetime.utcnow() == datetime.datetime(2022, 1, 21, 13, 21, 34)
+
+
+@freeze_time("2022-01-21T13:21:34Z")
+def test_utc_2():
+    assert datetime.datetime.utcnow() == datetime.datetime(2022, 1, 21, 13, 21, 34)
+
+
+@freeze_time("2022-01-21 13:21:34", tz_offset=0)
+def xxx_est_latest_1():
     client = Client(TEST_URL)
     date = client.latest(
         time=0,
