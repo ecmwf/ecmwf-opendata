@@ -105,5 +105,5 @@ def xxx_est_latest_1():
 #     assert date == datetime.date(2022, 1, 18)
 
 
-if __name__ == "__main__":
-    test_latest_1()
+# if __name__ == "__main__":
+#     test_latest_1()
