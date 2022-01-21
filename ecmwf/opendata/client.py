@@ -19,17 +19,18 @@ import requests
 from multiurl import download, robust
 
 from .date import fulldate
+from .urls import URLS
 
 LOG = logging.getLogger(__name__)
 
 HOURLY_PATTERN = (
     "{_url}/{_yyyymmdd}/{_H}z/{resol}/{stream}/"
-    "{_yyyymmddHHMMSS}-{step}h-{stream}-{type}.{extension}"
+    "{_yyyymmddHHMMSS}-{step}h-{stream}-{type}.{_extension}"
 )
 
 MONTHLY_PATTERN = (
     "{_url}/{_yyyymmdd}/{_H}z/{resol}/{stream}/"
-    "{_yyyymmddHHMMSS}-{fcmonth}m-{stream}-{type}.{extension}"
+    "{_yyyymmddHHMMSS}-{fcmonth}m-{stream}-{type}.{_extension}"
 )
 
 URL_TYPE_MAPPING = {
@@ -59,10 +60,6 @@ step_mapping.update({str(x): "360" for x in range(240, 361)})
 
 URL_STEP_MAPPING = {}
 URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_mapping
-
-URLS = {
-  
-}
 
 
 class Client:
@@ -155,15 +152,6 @@ class Client:
 
         params["_url"] = self.url
 
-        types = params["type"]
-        if isinstance(types, (list, tuple)):
-            extension = set(EXTENSIONS.get(e, "grib2") for e in types)
-            assert len(extension) == 1, extension
-            extension = list(extension)[0]
-        else:
-            extension = EXTENSIONS.get(type, "grib2")
-        params["extension"] = extension
-
         if target is None:
             target = params.pop("target", None)
 
@@ -206,6 +194,7 @@ class Client:
             args["_yyyymmdd"] = date.strftime("%Y%m%d")
             args["_H"] = date.strftime("%H")
             args["_yyyymmddHHMMSS"] = date.strftime("%Y%m%d%H%M%S")
+            args["_extension"] = EXTENSIONS.get(args["type"], "grib2")
             url = pattern.format(**args)
             if url not in seen:
                 data_urls.append(url)
@@ -259,10 +248,25 @@ class Client:
                 return p.split("-")[-1]
             return str(p)
 
-        assert len(for_urls["type"]) == 1, (
-            for_urls["type"],
-            len(for_urls["type"]),
-        )  # For now
+        # For now
+        if len(for_urls["type"]) > 1:
+
+            idx = URL_STEP_MAPPING.get(for_urls["type"][0])
+            # All types need to map to the same index file
+            assert all(idx == URL_STEP_MAPPING.get(t) for t in for_urls["type"]), (
+                for_urls,
+                [URL_STEP_MAPPING.get(t) for t in for_urls["type"]],
+            )
+
+        if len(for_urls["stream"]) > 1:
+            idx = URL_STREAM_MAPPING.get(for_urls["stream"][0], for_urls["stream"][0])
+            # All streams need to map to the same index file
+            assert all(
+                idx == URL_STREAM_MAPPING.get(t, t) for t in for_urls["stream"]
+            ), (
+                for_urls,
+                [URL_STREAM_MAPPING.get(t, t) for t in for_urls["stream"]],
+            )
 
         for step in ("step",):  # "fcmonth"):
             if step in for_urls:
@@ -274,9 +278,11 @@ class Client:
                 for t in for_urls["step"]
             ]
 
-        for_index["type"] = INDEX_TYPE_MAPPING.get(
-            for_urls["type"][0], for_urls["type"]
-        )
+        for_index["type"] = set()
+        for t in for_urls["type"]:
+            for_index["type"].update(INDEX_TYPE_MAPPING.get(t, [t]))
+
+        for_index["type"] = list(for_index["type"])
 
         for_urls["type"] = [URL_TYPE_MAPPING.get(t, t) for t in for_urls["type"]]
         for_urls["stream"] = [URL_STREAM_MAPPING.get(s, s) for s in for_urls["stream"]]

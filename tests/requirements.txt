@@ -1,1 +1,3 @@
 freezegun
+ecmwflibs
+eccodes

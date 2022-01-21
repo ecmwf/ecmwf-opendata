@@ -146,6 +146,7 @@ data
 *.1
 !setup.py
 !tests/*.py
+!tests/requirements.txt
 !ecmwf/**/*.py
 test.*
 *.bufr
