@@ -124,7 +124,7 @@ class Client:
                 **params,
             )
             codes = [robust(requests.head)(url).status_code for url in data_urls]
-            print("URLS", codes)
+            print("URLS", data_urls)
             print("CODES", codes)
             if len(codes) > 0 and all(c == 200 for c in codes):
                 if "time" not in params:
