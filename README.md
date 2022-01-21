@@ -184,7 +184,7 @@ client.retrieve(
 ```
 ### ECMWF open data license
 
-By downloading data from the ECMWF open data dataset, you agree to the their terms: Attribution 4.0 International (CC BY 4.0). If you do not agree with such terms, do not download the data.
+By downloading data from the ECMWF open data dataset, you agree to the their terms: Attribution 4.0 International (CC BY 4.0). If you do not agree with such terms, do not download the data. Visit [this page](https://apps.ecmwf.int/datasets/licences/general/) for more information.
 
 ### License
 [Apache License 2.0](LICENSE) In applying this licence, ECMWF does not waive the privileges and immunities
