@@ -101,7 +101,6 @@ class Client:
             use_index=True,
             **kwargs,
         )
-        # print(data_urls)
         download(data_urls, target=target)
 
     def latest(self, request=None, **kwargs):
@@ -109,12 +108,16 @@ class Client:
             params = dict(**kwargs)
         else:
             params = dict(**request)
+
         if "time" not in params:
             delta = datetime.timedelta(hours=6)
         else:
             delta = datetime.timedelta(days=1)
+
         date = fulldate(0, params.get("time"))
+
         stop = date - datetime.timedelta(days=1, hours=6)
+
         while date > stop:
             data_urls, _ = self._get_urls(
                 request=None,
@@ -123,7 +126,6 @@ class Client:
                 **params,
             )
             codes = [robust(requests.head)(url).status_code for url in data_urls]
-            # print(codes)
             if len(codes) > 0 and all(c == 200 for c in codes):
                 if "time" not in params:
                     return date
