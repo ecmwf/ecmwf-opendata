@@ -46,7 +46,7 @@ jobs:
         run: |
           pip install pytest
           pip install -e .
-          pip install tests/requirements.txt
+          pip install -r tests/requirements.txt
           pip freeze
 
       - name: Tests
