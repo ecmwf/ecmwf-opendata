@@ -61,8 +61,7 @@ URL_STEP_MAPPING = {}
 URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_mapping
 
 URLS = {
-    "ecmwf": "https://dissemination.ecmwf.int/ecpds/home/opendata",
-    "azure": "https://ai4edataeuwest.blob.core.windows.net/ecmwf",
+  
 }
 
 
@@ -156,7 +155,14 @@ class Client:
 
         params["_url"] = self.url
 
-        params["extension"] = EXTENSIONS.get(params["type"], "grib2")
+        types = params["type"]
+        if isinstance(types, (list, tuple)):
+            extension = set(EXTENSIONS.get(e, "grib2") for e in types)
+            assert len(extension) == 1, extension
+            extension = list(extension)[0]
+        else:
+            extension = EXTENSIONS.get(type, "grib2")
+        params["extension"] = extension
 
         if target is None:
             target = params.pop("target", None)

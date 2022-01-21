@@ -4,7 +4,6 @@ set -eau
 
 DATE1=20220119
 DATE2=20220120
-URL=https://dissemination.ecmwf.int/ecpds/home/opendata/
 touch done
 
 for time in 00 06 12 18
