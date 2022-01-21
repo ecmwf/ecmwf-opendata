@@ -1,8 +1,5 @@
 import datetime
-import os
-from unittest.mock import Mock, patch
 
-import pytest
 from freezegun import freeze_time
 
 from ecmwf.opendata import Client
@@ -99,4 +96,4 @@ def test_latest_1():
 
 
 if __name__ == "__main__":
-    test_opendata_1()
+    test_latest_1()
