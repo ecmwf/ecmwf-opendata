@@ -29,7 +29,9 @@ def test_latest_1():
         param="2t",
         target="data.grib",
     )
-    print(date, type(date), datetime.date(2022, 1, 20), type(datetime.date(2022, 1, 20)))
+    print(
+        date, type(date), datetime.date(2022, 1, 20), type(datetime.date(2022, 1, 20))
+    )
     assert date == datetime.date(2022, 1, 20)
 
 
