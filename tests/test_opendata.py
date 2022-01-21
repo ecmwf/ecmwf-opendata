@@ -59,7 +59,7 @@ def xx_test_opendata_1():
 
 
 @freeze_time("2022-01-21 13:21:34", tz_offset=0)
-def xx_test_opendata_2():
+def test_opendata_2():
     client = Client(TEST_URL)
     client.retrieve(
         date=-1,
@@ -76,7 +76,7 @@ def xx_test_opendata_2():
 
 
 @freeze_time("2022-01-21 13:21:34", tz_offset=0)
-def xx_test_opendata_3():
+def test_opendata_3():
     client = Client(TEST_URL)
     client.retrieve(
         date=-1,
@@ -93,7 +93,7 @@ def xx_test_opendata_3():
 
 
 @freeze_time("2022-01-21 13:21:34", tz_offset=0)
-def xx_test_opendata_4():
+def test_opendata_4():
     client = Client(TEST_URL)
     client.retrieve(
         date=-1,
