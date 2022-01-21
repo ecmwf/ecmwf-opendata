@@ -7,6 +7,11 @@ from ecmwf.opendata import Client
 TEST_URL = "https://get.ecmwf.int/repository/ecmwf-opendata/testing"
 
 
+def test_utc():
+    print("NOW is", datetime.datetime.now())
+    print("UTC is", datetime.datetime.utcnow())
+
+
 @freeze_time("2022-01-21 13:21:34", tz_offset=0)
 def test_utc_1():
     assert datetime.datetime.utcnow() == datetime.datetime(2022, 1, 21, 13, 21, 34)
