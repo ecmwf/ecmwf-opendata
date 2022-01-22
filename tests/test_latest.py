@@ -25,7 +25,7 @@ def test_latest_00():
         target="data.grib",
     )
 
-    assert date == datetime.date(2022, 1, 20)
+    assert date == datetime.datetime(2022, 1, 20)
 
 
 @freeze_time("2022-01-21T13:21:34Z")
@@ -40,7 +40,7 @@ def test_latest_06():
         target="data.grib",
     )
 
-    assert date == datetime.date(2022, 1, 20)
+    assert date == datetime.datetime(2022, 1, 20, 6)
 
 
 @freeze_time("2022-01-21T13:21:34Z")
@@ -55,14 +55,14 @@ def test_latest_12():
         target="data.grib",
     )
 
-    assert date == datetime.date(2022, 1, 20)
+    assert date == datetime.datetime(2022, 1, 20, 12)
 
 
-@freeze_time("2022-01-21T13:21:34Z")
+@freeze_time("2022-01-20T13:21:34Z")
 def test_latest_18():
     client = Client(TEST_URL)
     date = client.latest(
-        time=6,
+        time=18,
         step=48,
         type="fc",
         levtype="sfc",
@@ -70,4 +70,4 @@ def test_latest_18():
         target="data.grib",
     )
 
-    assert date == datetime.date(2022, 1, 20)
+    assert date == datetime.datetime(2022, 1, 19, 18)
