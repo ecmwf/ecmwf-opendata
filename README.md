@@ -19,7 +19,31 @@ client.retrieve(
 ```
 
 
-## Download examples
+## Options
+
+TODO
+
+## Request syntax
+
+### Date, time
+
+...
+
+### Stream and type
+
+...
+
+### Time steps
+
+...
+
+### Parameters and levels
+
+For a complete list of parameters, refer to this [page](https://www.ecmwf.int/en/forecasts/datasets/open-data)
+
+### Ensemble numbers
+
+## Examples
 
 ### Download a single surface parameter at a single forecast step from ECMWF's 00UTC HRES forecast
 
@@ -57,8 +81,10 @@ client.retrieve(
     target="data.bufr",
 )
 ```
+
 - The downloaded data are encoded in BUFR edition 4
 - For the HRES Tropical Cyclone tracks at time=06 and time=18 use:
+
 ```python
 ...
    stream = "scda",
@@ -81,6 +107,7 @@ client.retrieve(
    target = "data.grib2"
 )
 ```
+
 - To download a single ensemble member, use the **number** keyword:  `number = [1,]`.
 - All of the odd numbered ensemble members use `number = [num for num in range(1,51,2)]`.
 - To download the control member, use `type = "cf"`.
@@ -103,6 +130,7 @@ client.retrieve(
 )
 
 ```
+
 - The downloaded data are encoded in BUFR edition 4
 - For the ENS Tropical Cyclone tracks at time=06 and time=18 replace `step = [240,]` with `step = [144,]`.
 
@@ -124,7 +152,9 @@ client.retrieve(
 )
 
 ```
+
 and `type = "es"`, respectively:
+
 ```python
 from ecmwf.opendata import Client
 
@@ -142,13 +172,17 @@ client.retrieve(
 
 ### Download the ensemble probability products
 
-The ensemble probability products are identified by the keyword`type = "ep"`.  The probability products are available only for time=00 and time=12.
+The ensemble probability products are identified by the keyword `type
+= "ep"`.  The probability products are available only for time=00
+and time=12.
 
 Two different productsa are available.
 
 #### Probabilities - Instantaneous weather events - Pressure levels
 
-The probability of temperature standardized anomalies at a constant pressure level of 850hPa are available at 12 hourly forecast steps.
+The probability of temperature standardized anomalies at a constant
+pressure level of 850hPa are available at 12 hourly forecast steps.
+
 
 ```python
 from ecmwf.opendata import Client
@@ -174,6 +208,7 @@ client.retrieve(
 )
 
 ```
+
 #### Probabilities - Daily weather events - Single level
 
 The probabilities of total precipitation and wind gusts exceeding specified thresholds in a 24 hour period are available for step ranges 0-24 to 336-360 by 12​​.  These are specified in the retrieval request using, e.g.: `step = ["0-24", "12-36", "24-48"]`.
@@ -195,12 +230,13 @@ client.retrieve(
     target="data.grib2",
 )
 
-
 ```
+
 ### ECMWF open data license
 
 By downloading data from the ECMWF open data dataset, you agree to the their terms: Attribution 4.0 International (CC BY 4.0). If you do not agree with such terms, do not download the data. Visit [this page](https://apps.ecmwf.int/datasets/licences/general/) for more information.
 
 ### License
+
 [Apache License 2.0](LICENSE) In applying this licence, ECMWF does not waive the privileges and immunities
 granted to it by virtue of its status as an intergovernmental organisation nor does it submit to any jurisdiction.
