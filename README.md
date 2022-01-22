@@ -108,7 +108,7 @@ client.retrieve(
 
 ### Download the ensemble mean and standard deviation for all parameters at a single forecast step from ECMWF's 00UTC ENS forecast (Set III-iv)
 
-The ensemble mean and standard deviation are identified by the keywords `type = "em"` and `type = "es"`, respectively:
+The ensemble mean and standard deviation are identified by the keywords `type = "em"`:
 
 ```python
 from ecmwf.opendata import Client
@@ -118,7 +118,22 @@ client = Client(source="ecmwf")
 client.retrieve(
     time=0,
     stream="enfo",
-    type=["es", "em"],
+    type="em",
+    step=24,
+    target="data.grib2",
+)
+
+```
+and `type = "es"`, respectively:
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf")
+
+client.retrieve(
+    time=0,
+    stream="enfo",
+    type="es",
     step=24,
     target="data.grib2",
 )
