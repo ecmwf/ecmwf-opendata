@@ -25,13 +25,44 @@ TODO
 
 ## Request syntax
 
-### Date, time
+### Date and time
 
+The date and time parameters refer to the starting time of the forecast. All date and time are expressed in UTC.
+
+
+There are several way to specify the date and time in a request.
+
+```python
 ...
+    date='20220125',
+    time=12,
+...
+```
+
+The keyword `time` can be given as a string or an integer. All values of time below are equivalent:
+
+```python
+...
+    time=12,
+    time=1200,
+    time='12',
+    time='1200'
+...```
+
+If `time` is not specified, the time is extracted from the date.
+
+```python
+...
+   date='2022-01-25 12:00:00',
+...
+```
+
+If the `time` keyword is specified, it overrides any time given in the request.
 
 ### Stream and type
 
-...
+ECMWF runs several foreacsting systems that are refered to using the keywords
+`stream` and `type`.
 
 ### Time steps
 

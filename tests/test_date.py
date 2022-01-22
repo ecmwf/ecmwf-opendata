@@ -64,6 +64,10 @@ def test_date():
     assert full_date(0, "18") == datetime.datetime(2022, 1, 21, 18)
     assert full_date(-10, "18") == datetime.datetime(2022, 1, 11, 18)
 
+    assert full_date("2022-01-25 12:00:00") == datetime.datetime(2022, 1, 25, 12)
+    assert full_date("2022-01-25 12:00:00", "18") == datetime.datetime(2022, 1, 25, 18)
+    assert full_date("2022-01-25T12:00:00") == datetime.datetime(2022, 1, 25, 12)
+
 
 def test_time():
     assert canonical_time(0) == 0
