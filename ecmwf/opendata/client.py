@@ -13,7 +13,6 @@ import itertools
 import json
 import logging
 import os
-import re
 from collections import defaultdict
 
 import requests
@@ -45,15 +44,16 @@ class Client:
         url=None,
         beta=True,
         preserve_request_order=False,
+        auto_stream=True,
     ):
         self._url = url
         self.source = source
         self.beta = beta
         self.preserve_request_order = preserve_request_order
+        self.auto_stream = auto_stream
 
     @property
     def url(self):
-        global URLS
 
         if self._url is None:
 
@@ -291,6 +291,18 @@ class Client:
             ("oper", "18"): "scda",
             ("wave", "06"): "scwv",
             ("wave", "18"): "scwv",
+            #
+            ("oper", "ef"): "enfo",
+            ("wave", "ef"): "waef",
+            ("oper", "ep"): "enfo",
+            ("wave", "ep"): "waef",
         }
-        stream, time = args["stream"], args["_H"]
-        return URL_STREAM_MAPPING.get((stream, time), stream)
+        stream, time, type = args["stream"], args["_H"], args["type"]
+
+        if not self.auto_stream:
+            return stream
+
+        stream = URL_STREAM_MAPPING.get((stream, time), stream)
+        stream = URL_STREAM_MAPPING.get((stream, type), stream)
+
+        return stream

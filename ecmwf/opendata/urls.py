@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # (C) Copyright 2021 ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
@@ -7,9 +8,16 @@
 # nor does it submit to any jurisdiction.
 #
 
+import json
+import os
 
-from .client import Client
+DOT_ECMWF_OPENDATA = os.path.expanduser("~/.ecmwf-opendata")
 
-__version__ = "0.0.14"
+URLS = {}
 
-__all__ = ["Client"]
+if os.path.exists(DOT_ECMWF_OPENDATA):
+    with open(DOT_ECMWF_OPENDATA) as f:
+        URLS = json.load(f)
+
+if "ECMWF_OPENDATA_URLS" in os.environ:
+    URLS = json.loads(os.environ["ECMWF_OPENDATA_URLS"])

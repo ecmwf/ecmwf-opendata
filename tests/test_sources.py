@@ -2,9 +2,11 @@ import pytest
 
 from ecmwf.opendata import Client
 from ecmwf.opendata.bufr import count_bufrs
-from ecmwf.opendata.grib import count_gribs, grib_index
+from ecmwf.opendata.grib import count_gribs
 
-SOURCES = ["ecmwf", "azure"]
+SOURCES = [
+    "ecmwf",
+]  # "azure"]
 
 
 @pytest.mark.parametrize("source", SOURCES)

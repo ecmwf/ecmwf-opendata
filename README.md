@@ -21,7 +21,7 @@ client.retrieve(
 
 ## Download examples
 
-### Download a single surface parameter at a single forecast step from ECMWF's 00UTC HRES forecast (Product Set I-i)
+### Download a single surface parameter at a single forecast step from ECMWF's 00UTC HRES forecast
 
 ```python
 from ecmwf.opendata import Client
@@ -66,7 +66,7 @@ client.retrieve(
 ...
 ```
 
-### Download a single surface parameter at a single forecast step for all ensemble members from ECMWF's 12UTC 00UTC ENS forecast (Set III-i)
+### Download a single surface parameter at a single forecast step for all ensemble members from ECMWF's 12UTC 00UTC ENS forecast
 
 ```python
 from ecmwf.opendata import Client
@@ -85,7 +85,7 @@ client.retrieve(
 - All of the odd numbered ensemble members use `number = [num for num in range(1,51,2)]`.
 - To download the control member, use `type = "cf"`.
 
-### Download the Tropical Cyclone tracks from ECMWF's 00UTC ENS forecast (Set I-iii)
+### Download the Tropical Cyclone tracks from ECMWF's 00UTC ENS forecast
 
 The Tropical Cyclone tracks are identified by the keyword `type = "tf"`.
 
@@ -106,7 +106,7 @@ client.retrieve(
 - The downloaded data are encoded in BUFR edition 4
 - For the ENS Tropical Cyclone tracks at time=06 and time=18 replace `step = [240,]` with `step = [144,]`.
 
-### Download the ensemble mean and standard deviation for all parameters at a single forecast step from ECMWF's 00UTC ENS forecast (Set III-iv)
+### Download the ensemble mean and standard deviation for all parameters at a single forecast step from ECMWF's 00UTC ENS forecast
 
 The ensemble mean and standard deviation are identified by the keywords `type = "em"`:
 
@@ -140,13 +140,13 @@ client.retrieve(
 
 ```
 
-### Download the ensemble probability products (Set III-iii-c)
+### Download the ensemble probability products
 
 The ensemble probability products are identified by the keyword`type = "ep"`.  The probability products are available only for time=00 and time=12.
 
 Two different productsa are available.
 
-#### Probabilities - Instantaneous weather events - Pressure levels (Set III-iii-c)
+#### Probabilities - Instantaneous weather events - Pressure levels
 
 The probability of temperature standardized anomalies at a constant pressure level of 850hPa are available at 12 hourly forecast steps.
 
@@ -174,7 +174,7 @@ client.retrieve(
 )
 
 ```
-#### Probabilities - Daily weather events - Single level (Set III-iii-e)
+#### Probabilities - Daily weather events - Single level
 
 The probabilities of total precipitation and wind gusts exceeding specified thresholds in a 24 hour period are available for step ranges 0-24 to 336-360 by 12​​.  These are specified in the retrieval request using, e.g.: `step = ["0-24", "12-36", "24-48"]`.
 

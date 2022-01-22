@@ -2,8 +2,6 @@ import os
 
 import pytest
 
-from ecmwf.opendata import Client
-
 README = os.path.realpath(
     os.path.join(os.path.dirname(os.path.dirname(__file__)), "README.md")
 )

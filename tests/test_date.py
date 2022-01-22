@@ -88,3 +88,9 @@ def test_time():
     assert canonical_time("0600") == 6
     assert canonical_time("1200") == 12
     assert canonical_time("1800") == 18
+
+
+def test_step():
+    assert end_step(24) == 24
+    assert end_step("24") == 24
+    assert end_step("12-24") == 24
