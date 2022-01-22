@@ -37,6 +37,16 @@ PATTERNS = {"mmsa": MONTHLY_PATTERN}
 EXTENSIONS = {"tf": "bufr"}
 
 
+class Result:
+    def __init__(self, urls, target, dates):
+        self.urls = urls
+        self.target = target
+        if len(dates) == 1:
+            self.datetime = dates[0]
+        else:
+            self.datetime = dates
+
+
 class Client:
     def __init__(
         self,
@@ -65,13 +75,9 @@ class Client:
         return self._url
 
     def retrieve(self, request=None, target=None, **kwargs):
-        data_urls, target = self._get_urls(
-            request,
-            target=target,
-            use_index=True,
-            **kwargs,
-        )
-        download(data_urls, target=target)
+        result = self._get_urls(request, target=target, use_index=True, **kwargs)
+        result.size = download(result.urls, target=result.target)
+        return result
 
     def latest(self, request=None, **kwargs):
         if request is None:
@@ -89,13 +95,13 @@ class Client:
         stop = date - datetime.timedelta(days=1, hours=6)
 
         while date > stop:
-            data_urls, _ = self._get_urls(
+            result = self._get_urls(
                 request=None,
                 use_index=False,
                 date=date,
                 **params,
             )
-            codes = [robust(requests.head)(url).status_code for url in data_urls]
+            codes = [robust(requests.head)(url).status_code for url in result.data_urls]
             if len(codes) > 0 and all(c == 200 for c in codes):
                 if "time" not in params:
                     return date
@@ -125,11 +131,14 @@ class Client:
         seen = set()
         data_urls = []
 
+        dates = set()
+
         for args in (
             dict(zip(for_urls.keys(), x)) for x in itertools.product(*for_urls.values())
         ):
             pattern = PATTERNS.get(args["stream"], HOURLY_PATTERN)
             date = full_date(args.pop("date", None), args.pop("time", None))
+            dates.add(date)
             args["_yyyymmdd"] = date.strftime("%Y%m%d")
             args["_H"] = date.strftime("%H")
             args["_yyyymmddHHMMSS"] = date.strftime("%Y%m%d%H%M%S")
@@ -144,7 +153,7 @@ class Client:
         if for_index and use_index:
             data_urls = self.get_parts(data_urls, for_index)
 
-        return data_urls, target
+        return Result(urls=data_urls, target=target, dates=sorted(dates))
 
     def get_parts(self, data_urls, for_index):
 
