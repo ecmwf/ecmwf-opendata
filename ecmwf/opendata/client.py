@@ -101,12 +101,9 @@ class Client:
                 date=date,
                 **params,
             )
-            codes = [robust(requests.head)(url).status_code for url in result.data_urls]
+            codes = [robust(requests.head)(url).status_code for url in result.urls]
             if len(codes) > 0 and all(c == 200 for c in codes):
-                if "time" not in params:
-                    return date
-                else:
-                    return datetime.date(date.year, date.month, date.day)
+                return date
             date -= delta
 
         raise ValueError(f"Cannot etablish latest date for {params}")
