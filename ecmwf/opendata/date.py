@@ -13,7 +13,20 @@ import re
 VALID_DATE = re.compile(r"\d\d\d\d-\d\d-\d\d([T\s]\d\d:\d\d(:\d\d)?)?Z?")
 
 
-def fulldate(date, time=None):
+def end_step(p):
+    if isinstance(p, str):
+        return int(p.split("-")[-1])
+    return int(p)
+
+
+def canonical_time(time):
+    time = int(time)
+    if time >= 100:
+        time //= 100
+    return time
+
+
+def full_date(date, time=None):
 
     if isinstance(date, datetime.date):
         date = datetime.datetime(date.year, date.month, date.day)
@@ -28,7 +41,7 @@ def fulldate(date, time=None):
     if isinstance(date, str):
 
         try:
-            return fulldate(int(date), time)
+            return full_date(int(date), time)
         except ValueError:
             pass
 
@@ -39,9 +52,7 @@ def fulldate(date, time=None):
         raise ValueError("Invalid date: {} ({})".format(date, type(date)))
 
     if time is not None:
-        time = int(time)
-        if time >= 100:
-            time //= 100
+        time = canonical_time(time)
         date = datetime.datetime(date.year, date.month, date.day, time, 0, 0)
 
     return date

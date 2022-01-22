@@ -14,52 +14,28 @@ import json
 import logging
 import os
 import re
+from collections import defaultdict
 
 import requests
 from multiurl import download, robust
 
-from .date import fulldate
+from .date import canonical_time, end_step, full_date
 from .urls import URLS
 
 LOG = logging.getLogger(__name__)
 
 HOURLY_PATTERN = (
-    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{stream}/"
-    "{_yyyymmddHHMMSS}-{step}h-{stream}-{type}.{_extension}"
+    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{_stream}/"
+    "{_yyyymmddHHMMSS}-{step}h-{_stream}-{type}.{_extension}"
 )
 
 MONTHLY_PATTERN = (
-    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{stream}/"
-    "{_yyyymmddHHMMSS}-{fcmonth}m-{stream}-{type}.{_extension}"
+    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{_stream}/"
+    "{_yyyymmddHHMMSS}-{fcmonth}m-{_stream}-{type}.{_extension}"
 )
 
-URL_TYPE_MAPPING = {
-    "cf": "ef",
-    "pf": "ef",
-    "em": "ep",
-    "es": "ep",
-    "fcmean": "fc",
-}
-
-URL_STREAM_MAPPING = {
-    "mmsa": "mmsf",
-    # "wave": "oper",
-}
-
-
-INDEX_TYPE_MAPPING = {"ef": ["cf", "pf"]}
-
 PATTERNS = {"mmsa": MONTHLY_PATTERN}
-OTHER_STEP = {"mmsa": "step"}
-NO_INDEX = {"tf"}
 EXTENSIONS = {"tf": "bufr"}
-
-step_mapping = {}
-step_mapping.update({str(x): "240" for x in range(0, 241)})
-step_mapping.update({str(x): "360" for x in range(240, 361)})
-
-URL_STEP_MAPPING = {}
-URL_STEP_MAPPING["em"] = URL_STEP_MAPPING["es"] = URL_STEP_MAPPING["ep"] = step_mapping
 
 
 class Client:
@@ -108,7 +84,7 @@ class Client:
         else:
             delta = datetime.timedelta(days=1)
 
-        date = fulldate(0, params.get("time"))
+        date = full_date(0, params.get("time"))
 
         stop = date - datetime.timedelta(days=1, hours=6)
 
@@ -136,65 +112,30 @@ class Client:
         else:
             params = dict(**request)
 
-        defaults = dict(
-            resol="0p4-beta" if self.beta else "0p4",
-            type="fc",
-            stream="oper",
-            step=0,
-            fcmonth=1,
-        )
-
-        for key, value in defaults.items():
-            params.setdefault(key, value)
-
         if "date" not in params:
             params["date"] = self.latest(params)
-
-        params["_url"] = self.url
 
         if target is None:
             target = params.pop("target", None)
 
-        pattern = PATTERNS.get(params["stream"], HOURLY_PATTERN)
+        for_urls, for_index = self.prepare_request(params)
 
-        params.pop(OTHER_STEP.get(params["stream"], "fcmonth"))
-
-        url_components = {"date", "time"}
-
-        for i, p in enumerate(re.split(r"{([^}]*)}", pattern)):
-            if i % 2 != 0:
-                if not p.startswith("_"):
-                    url_components.add(p)
-
-        LOG.debug("url_components are %s", url_components)
-
-        for_urls = {}
-        for_index = {}
-        for k, v in list(params.items()):
-            if not isinstance(v, (list, tuple)):
-                v = [v]
-            if not k.startswith("_") and k not in url_components:
-                for_index[k] = [str(x) for x in v]
-                assert len(set(for_index[k])) == len(for_index[k])
-            else:
-                for_urls[k] = [str(x) for x in v]
-                assert len(set(for_urls[k])) == len(for_urls[k])
-
-        self.patch(for_index, for_urls)
-
-        params = None
+        for_urls["_url"] = [self.url]
 
         seen = set()
         data_urls = []
+
         for args in (
             dict(zip(for_urls.keys(), x)) for x in itertools.product(*for_urls.values())
         ):
-            # print(args)
-            date = fulldate(args.pop("date", None), args.pop("time", None))
+            pattern = PATTERNS.get(args["stream"], HOURLY_PATTERN)
+            date = full_date(args.pop("date", None), args.pop("time", None))
             args["_yyyymmdd"] = date.strftime("%Y%m%d")
             args["_H"] = date.strftime("%H")
             args["_yyyymmddHHMMSS"] = date.strftime("%Y%m%d%H%M%S")
             args["_extension"] = EXTENSIONS.get(args["type"], "grib2")
+            args["_stream"] = self.patch_stream(args)
+
             url = pattern.format(**args)
             if url not in seen:
                 data_urls.append(url)
@@ -206,8 +147,6 @@ class Client:
         return data_urls, target
 
     def get_parts(self, data_urls, for_index):
-
-        # print(for_index)
 
         count = len(for_index)
         result = []
@@ -242,51 +181,116 @@ class Client:
         assert len(result) > 0, (for_index, line)
         return result
 
-    def patch(self, for_index, for_urls):
-        def last_step(p):
-            if isinstance(p, str):
-                return p.split("-")[-1]
-            return str(p)
+    def user_to_index(self, key, value, request, for_index):
+        FOR_INDEX = {
+            ("type", "ef"): ["cf", "pf"],
+        }
 
-        # For now
-        if len(for_urls["type"]) > 1:
+        return FOR_INDEX.get((key, value), value)
 
-            idx = URL_STEP_MAPPING.get(for_urls["type"][0])
-            # All types need to map to the same index file
-            assert all(idx == URL_STEP_MAPPING.get(t) for t in for_urls["type"]), (
-                for_urls,
-                [URL_STEP_MAPPING.get(t) for t in for_urls["type"]],
-            )
+    def user_to_url(self, key, value, request, for_urls):
+        FOR_URL = {
+            ("type", "cf"): "ef",
+            ("type", "pf"): "ef",
+            ("type", "em"): "ep",
+            ("type", "es"): "ep",
+            ("type", "fcmean"): "fc",
+            ("stream", "mmsa"): "mmsf",
+        }
 
-        if len(for_urls["stream"]) > 1:
-            idx = URL_STREAM_MAPPING.get(for_urls["stream"][0], for_urls["stream"][0])
-            # All streams need to map to the same index file
-            assert all(
-                idx == URL_STREAM_MAPPING.get(t, t) for t in for_urls["stream"]
-            ), (
-                for_urls,
-                [URL_STREAM_MAPPING.get(t, t) for t in for_urls["stream"]],
-            )
+        if key == "step" and for_urls["type"] == ["ep"]:
+            if end_step(value) <= 240:
+                return "240"
+            else:
+                return "360"
 
-        for step in ("step",):  # "fcmonth"):
-            if step in for_urls:
-                for_index[step] = for_urls[step]
+        return FOR_URL.get((key, value), value)
 
-        if for_urls["type"][0] in URL_STEP_MAPPING:
-            for_urls["step"] = [
-                URL_STEP_MAPPING[for_urls["type"][0]][last_step(t)]
-                for t in for_urls["step"]
-            ]
+    def prepare_request(self, request=None, **kwargs):
+        DEFAULTS = dict(
+            resol="0p4-beta" if self.beta else "0p4",
+            type="fc",
+            stream="oper",
+            step=0,
+            fcmonth=1,
+        )
 
-        for_index["type"] = set()
-        for t in for_urls["type"]:
-            for_index["type"].update(INDEX_TYPE_MAPPING.get(t, [t]))
+        URL_COMPONENTS = (
+            "date",
+            "time",
+            "resol",
+            "stream",
+            "type",  # Must be before 'step' in that list
+            "step",
+            "fcmonth",
+        )
 
-        for_index["type"] = list(for_index["type"])
+        INDEX_COMPONENTS = (
+            "param",
+            "type",
+            "step",
+            "fcmonth",
+            "number",
+            "levelist",
+            "levtype",
+        )
 
-        for_urls["type"] = [URL_TYPE_MAPPING.get(t, t) for t in for_urls["type"]]
-        for_urls["stream"] = [URL_STREAM_MAPPING.get(s, s) for s in for_urls["stream"]]
+        CANONICAL = {
+            "time": lambda x: str(canonical_time(x)),
+        }
 
-        for t in for_urls["type"]:
-            if t in NO_INDEX:
-                for_index.clear()
+        OTHER_STEP = {"mmsa": "step"}
+
+        if request is None:
+            params = dict(**kwargs)
+        else:
+            params = dict(**request)
+
+        for key, value in DEFAULTS.items():
+            params.setdefault(key, value)
+
+        params.pop(OTHER_STEP.get(params["stream"], "fcmonth"), None)
+
+        for_urls = defaultdict(list)
+        for_index = defaultdict(list)
+
+        for k, v in list(params.items()):
+            if not isinstance(v, (list, tuple)):
+                v = [v]
+
+            # Return canonical forms
+            v = [CANONICAL.get(k, str)(x) for x in v]
+
+            if k.startswith("_"):
+                continue
+
+            if k in INDEX_COMPONENTS:
+                for values in [self.user_to_index(k, x, params, for_index) for x in v]:
+                    if not isinstance(values, (list, tuple)):
+                        values = [values]
+                    for value in values:
+                        if value not in for_index[k]:
+                            for_index[k].append(value)
+
+            if k in URL_COMPONENTS:
+                for values in [self.user_to_url(k, x, params, for_urls) for x in v]:
+                    if not isinstance(values, (list, tuple)):
+                        values = [values]
+                    for value in values:
+                        if value not in for_urls[k]:
+                            for_urls[k].append(value)
+
+        if params.get("type") == "tf":
+            for_index.clear()
+
+        return (for_urls, for_index)
+
+    def patch_stream(self, args):
+        URL_STREAM_MAPPING = {
+            ("oper", "06"): "scda",
+            ("oper", "18"): "scda",
+            ("wave", "06"): "scwv",
+            ("wave", "18"): "scwv",
+        }
+        stream, time = args["stream"], args["_H"]
+        return URL_STREAM_MAPPING.get((stream, time), stream)

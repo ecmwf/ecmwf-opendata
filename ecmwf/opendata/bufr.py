@@ -12,10 +12,7 @@
 For testing
 """
 
-from eccodes import (
-    codes_bufr_new_from_file,
-    codes_release,
-)
+from eccodes import codes_bufr_new_from_file, codes_release
 
 
 def count_bufrs(path):

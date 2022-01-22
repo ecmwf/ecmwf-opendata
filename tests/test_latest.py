@@ -7,110 +7,67 @@ from ecmwf.opendata import Client
 TEST_URL = "https://get.ecmwf.int/repository/ecmwf-opendata/testing"
 
 
+@freeze_time("2022-01-21t13:21:34Z")
 def test_utc():
-    print("NOW is", datetime.datetime.now())
-    print("UTC is", datetime.datetime.utcnow())
-
-
-@freeze_time("2022-01-21 13:21:34", tz_offset=0)
-def test_utc_1():
     assert datetime.datetime.utcnow() == datetime.datetime(2022, 1, 21, 13, 21, 34)
 
 
 @freeze_time("2022-01-21T13:21:34Z")
-def test_utc_2():
-    assert datetime.datetime.utcnow() == datetime.datetime(2022, 1, 21, 13, 21, 34)
-
-
-@freeze_time("2022-01-21T13:21:34Z")
-def test_latest_1():
+def test_latest_00():
     client = Client(TEST_URL)
     date = client.latest(
         time=0,
-        step="48",
+        step=48,
         stream="oper",
         type="fc",
         levtype="sfc",
         param="2t",
         target="data.grib",
     )
-    print(
-        date, type(date), datetime.date(2022, 1, 20), type(datetime.date(2022, 1, 20))
-    )
+
     assert date == datetime.date(2022, 1, 20)
 
 
-# def test_opendata_1():
-#     client = Client(TEST_URL)
-#     date = client.latest(
-#         time=0,
-#         step="144-168",
-#         stream="enfo",
-#         type="ep",
-#         levtype="sfc",
-#         param="tpg100",
-#         target="data.grib",
-#     )
+@freeze_time("2022-01-21T13:21:34Z")
+def test_latest_06():
+    client = Client(TEST_URL)
+    date = client.latest(
+        time=6,
+        step=48,
+        type="fc",
+        levtype="sfc",
+        param="2t",
+        target="data.grib",
+    )
 
-#     assert date == datetime.date(2022, 1, 18)
-
-
-# def test_opendata_2():
-#     client = Client(TEST_URL)
-#     date = client.latest(
-#         time=0,
-#         step=12,
-#         stream="enfo",
-#         type="ef",
-#         levtype="sfc",
-#         param="10u",
-#         target="data.grib",
-#     )
-
-#     assert date == datetime.date(2022, 1, 18)
+    assert date == datetime.date(2022, 1, 20)
 
 
-# def test_opendata_3():
-#     client = Client(TEST_URL)
-#     date = client.latest(
-#         step=12,
-#         stream="enfo",
-#         type="cf",
-#         levtype="sfc",
-#         param="10u",
-#         target="data.grib",
-#     )
+@freeze_time("2022-01-21T13:21:34Z")
+def test_latest_12():
+    client = Client(TEST_URL)
+    date = client.latest(
+        time=12,
+        step=48,
+        type="fc",
+        levtype="sfc",
+        param="2t",
+        target="data.grib",
+    )
 
-#     assert date == datetime.datetime(2022, 1, 18, 18)
-
-
-# def test_opendata_4():
-#     client = Client(TEST_URL)
-#     date = client.latest(
-#         time=0,
-#         step=12,
-#         stream="enfo",
-#         type="pf",
-#         levtype="sfc",
-#         param="10u",
-#         target="data.grib",
-#     )
-
-#     assert date == datetime.date(2022, 1, 18)
+    assert date == datetime.date(2022, 1, 20)
 
 
-# def test_opendata_6():
-#     client = Client(TEST_URL)
-#     date = client.latest(
-#         time=0,
-#         type="tf",
-#         stream="enfo",
-#         step=240,
-#         target="data.bufr",
-#     )
+@freeze_time("2022-01-21T13:21:34Z")
+def test_latest_18():
+    client = Client(TEST_URL)
+    date = client.latest(
+        time=6,
+        step=48,
+        type="fc",
+        levtype="sfc",
+        param="2t",
+        target="data.grib",
+    )
 
-#     assert date == datetime.date(2022, 1, 18)
-
-
-if __name__ == "__main__":
-    test_latest_1()
+    assert date == datetime.date(2022, 1, 20)

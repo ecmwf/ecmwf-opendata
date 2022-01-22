@@ -7,7 +7,7 @@ from ecmwf.opendata.grib import count_gribs, grib_index
 TEST_URL = "https://get.ecmwf.int/repository/ecmwf-opendata/testing"
 
 
-@freeze_time("2022-01-21 13:21:34", tz_offset=0)
+@freeze_time("2022-01-21t13:21:34z")
 def xx_test_opendata_1():
     client = Client(TEST_URL)
     client.retrieve(
@@ -24,7 +24,7 @@ def xx_test_opendata_1():
     assert count_gribs("data.grib") == 1
 
 
-@freeze_time("2022-01-21 13:21:34", tz_offset=0)
+@freeze_time("2022-01-21t13:21:34z")
 def test_opendata_2():
     client = Client(TEST_URL)
     client.retrieve(
@@ -41,7 +41,7 @@ def test_opendata_2():
     assert count_gribs("data.grib") == 51
 
 
-@freeze_time("2022-01-21 13:21:34", tz_offset=0)
+@freeze_time("2022-01-21t13:21:34z")
 def test_opendata_3():
     client = Client(TEST_URL)
     client.retrieve(
@@ -58,7 +58,7 @@ def test_opendata_3():
     assert count_gribs("data.grib") == 1
 
 
-@freeze_time("2022-01-21 13:21:34", tz_offset=0)
+@freeze_time("2022-01-21t13:21:34z")
 def test_opendata_4():
     client = Client(TEST_URL)
     client.retrieve(
@@ -75,7 +75,7 @@ def test_opendata_4():
     assert count_gribs("data.grib") == 50
 
 
-@freeze_time("2022-01-21 13:21:34", tz_offset=0)
+@freeze_time("2022-01-21t13:21:34z")
 def xx_test_opendata_6():
     client = Client(TEST_URL)
     client.retrieve(
