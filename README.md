@@ -1,7 +1,6 @@
 # ecmwf-opendata
 
-A package to download ECMWF open data
-
+A package to download ECMWF open data.
 ```python
 from ecmwf.opendata import Client
 
@@ -24,6 +23,8 @@ client.retrieve(
 TODO
 
 ## Request syntax
+
+ This package uses a request syntax similar to the one used by [ecmwf-api-client](https://github.com/ecmwf/ecmwf-api-client).
 
 ### Date and time
 

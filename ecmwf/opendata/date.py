@@ -56,3 +56,71 @@ def full_date(date, time=None):
         date = datetime.datetime(date.year, date.month, date.day, time, 0, 0)
 
     return date
+
+
+def _expandable(lst):
+    if len(lst) not in (3, 5):
+        return False
+
+    if not isinstance(lst[1], str) or lst[1].lower() != "to":
+        return False
+
+    if len(lst) == 5 and (not isinstance(lst[3], str) or lst[3].lower() != "by"):
+        return False
+
+    return True
+
+
+def expand_list(lst):
+    if not _expandable(lst):
+        return lst
+
+    start = int(lst[0])
+    end = int(lst[2])
+    by = 1
+
+    if len(lst) == 5:
+        by = int(lst[4])
+
+    assert start <= end and by > 0, (start, end, by)
+
+    return list(range(start, end + by, by))
+
+
+def expand_date(lst):
+    if not _expandable(lst):
+        return lst
+
+    start = full_date(lst[0])
+    end = full_date(lst[2])
+    by = 1
+
+    if len(lst) == 5:
+        by = int(lst[4])
+
+    assert start <= end and by > 0, (start, end, by)
+
+    result = []
+    by = datetime.timedelta(days=by)
+
+    while start <= end:
+        result.append(start.strftime("%Y%m%d"))
+        start += by
+
+    return result
+
+
+def expand_time(lst):
+    if not _expandable(lst):
+        return lst
+
+    start = canonical_time(lst[0])
+    end = canonical_time(lst[2])
+    by = 6
+
+    if len(lst) == 5:
+        by = int(lst[4])
+
+    assert start <= end and by > 0, (start, end, by)
+
+    return list(range(start, end + by, by))

@@ -18,7 +18,14 @@ from collections import defaultdict
 import requests
 from multiurl import download, robust
 
-from .date import canonical_time, end_step, full_date
+from .date import (
+    canonical_time,
+    end_step,
+    expand_date,
+    expand_list,
+    expand_time,
+    full_date,
+)
 from .urls import URLS
 
 LOG = logging.getLogger(__name__)
@@ -243,6 +250,14 @@ class Client:
 
         CANONICAL = {
             "time": lambda x: str(canonical_time(x)),
+            "param": lambda x: str(x).lower(),
+            "type": lambda x: str(x).lower(),
+            "stream": lambda x: str(x).lower(),
+        }
+
+        EXPAND_LIST = {
+            "date": expand_date,
+            "time": expand_time,
         }
 
         OTHER_STEP = {"mmsa": "step"}
@@ -255,14 +270,21 @@ class Client:
         for key, value in DEFAULTS.items():
             params.setdefault(key, value)
 
+        params.pop("target", None)
+
         params.pop(OTHER_STEP.get(params["stream"], "fcmonth"), None)
 
         for_urls = defaultdict(list)
         for_index = defaultdict(list)
 
         for k, v in list(params.items()):
+            if isinstance(v, str):
+                v = v.split("/")
+
             if not isinstance(v, (list, tuple)):
                 v = [v]
+
+            v = EXPAND_LIST.get(k, expand_list)(v)
 
             # Return canonical forms
             v = [CANONICAL.get(k, str)(x) for x in v]
@@ -289,7 +311,7 @@ class Client:
         if params.get("type") == "tf":
             for_index.clear()
 
-        return (for_urls, for_index)
+        return (dict(**for_urls), dict(**for_index))
 
     def patch_stream(self, args):
         URL_STREAM_MAPPING = {
