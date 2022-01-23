@@ -18,7 +18,6 @@ client.retrieve(
 )
 ```
 
-
 ## Options
 
 The constructor of the client object takes the following options:
@@ -71,7 +70,6 @@ client.retrieve(
     request=request,
     target="data.grib2",
 )
-
 ```
 
 or directly as arguments to the `retrieve()` method:
@@ -106,12 +104,11 @@ result = client.retrieve(
 )
 
 print(result.datetime)
-
 ```
 
 may print:
 
-```
+```bash
 2022-01-23 00:00:00
 ```
 
@@ -128,12 +125,11 @@ print(client.latest(
     param=["2t", "msl"],
     target="data.grib2",
 ))
-
 ```
 
 may print:
 
-```
+```bash
 2022-01-23 00:00:00
 ```
 
@@ -144,7 +140,6 @@ may print:
 ### Date and time
 
 The date and time parameters refer to the starting time of the forecast. All date and time are expressed in UTC.
-
 
 There are several way to specify the date and time in a request.
 
@@ -180,6 +175,8 @@ If the `time` keyword is specified, it overrides any time given in the request.
 
 ECMWF runs several forecasting systems that are referred to using the keywords
 `stream` and `type`.
+
+(See [`infer_stream_keyword`](#options))
 
 ### Time steps
 
