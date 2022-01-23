@@ -37,3 +37,8 @@ def test_example(example):
         exec(code, dict(__file__=README), {})
     except Exception as e:
         raise ValueError("Exception: %s\n%s" % (e, code))
+
+
+if __name__ == "__main__":
+    for e in example_list():
+        test_example(e)

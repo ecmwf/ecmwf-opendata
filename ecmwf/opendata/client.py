@@ -43,31 +43,77 @@ MONTHLY_PATTERN = (
 PATTERNS = {"mmsa": MONTHLY_PATTERN}
 EXTENSIONS = {"tf": "bufr"}
 
+ONCE = set()
+
+
+def warning_once(*args, did_you_mean=None):
+
+    if repr(args) in ONCE:
+        return
+
+    LOG.warning(*args)
+
+    ONCE.add(repr(args))
+
+    if did_you_mean:
+        (words, vocabulary) = did_you_mean
+
+        def levenshtein(a, b):
+            if len(a) == 0:
+                return len(b)
+
+            if len(b) == 0:
+                return len(a)
+
+            if a[0].lower() == b[0].lower():
+                return levenshtein(a[1:], b[1:])
+
+            return 1 + min(
+                [
+                    levenshtein(a[1:], b[1:]),
+                    levenshtein(a[1:], b),
+                    levenshtein(a, b[1:]),
+                ]
+            )
+
+        if not isinstance(words, (list, tuple)):
+            words = [words]
+
+        for word in words:
+            distance, best = min((levenshtein(word, w), w) for w in vocabulary)
+            if distance < min(len(word), len(best)):
+                LOG.warning(
+                    "Did you mean %r instead of %r?",
+                    best,
+                    word,
+                )
+
 
 class Result:
-    def __init__(self, urls, target, dates):
+    def __init__(self, urls, target, dates, for_urls, for_index):
         self.urls = urls
         self.target = target
         if len(dates) == 1:
             self.datetime = dates[0]
         else:
             self.datetime = dates
+        self.for_urls = for_urls
+        self.for_index = for_index
 
 
 class Client:
     def __init__(
         self,
         source="ecmwf",
-        url=None,
         beta=True,
         preserve_request_order=False,
-        auto_stream=True,
+        infer_stream_keyword=True,
     ):
-        self._url = url
+        self._url = None
         self.source = source
         self.beta = beta
         self.preserve_request_order = preserve_request_order
-        self.auto_stream = auto_stream
+        self.infer_stream_keyword = infer_stream_keyword
 
     @property
     def url(self):
@@ -113,9 +159,10 @@ class Client:
                 return date
             date -= delta
 
-        raise ValueError(f"Cannot etablish latest date for {params}")
+        raise ValueError("Cannot etablish latest date for %r" % (result.for_urls,))
 
     def _get_urls(self, request=None, use_index=None, target=None, **kwargs):
+
         assert use_index in (True, False)
         if request is None:
             params = dict(**kwargs)
@@ -157,13 +204,21 @@ class Client:
         if for_index and use_index:
             data_urls = self.get_parts(data_urls, for_index)
 
-        return Result(urls=data_urls, target=target, dates=sorted(dates))
+        return Result(
+            urls=data_urls,
+            target=target,
+            dates=sorted(dates),
+            for_urls=for_urls,
+            for_index=for_index,
+        )
 
     def get_parts(self, data_urls, for_index):
 
         count = len(for_index)
         result = []
         line = None
+
+        possible_values = defaultdict(set)
 
         for url in data_urls:
             base, _ = os.path.splitext(url)
@@ -177,6 +232,8 @@ class Client:
                 matches = []
                 for i, (name, values) in enumerate(for_index.items()):
                     idx = line.get(name)
+                    if idx is not None:
+                        possible_values[name].add(idx)
                     if idx in values:
                         if self.preserve_request_order:
                             for j, v in enumerate(values):
@@ -191,7 +248,19 @@ class Client:
             if parts:
                 result.append((url, tuple(p[1] for p in sorted(parts))))
 
-        assert len(result) > 0, (for_index, line)
+        for name, values in for_index.items():
+            diff = set(values).difference(possible_values[name])
+            for d in diff:
+                warning_once(
+                    "No index entries for %s=%s",
+                    name,
+                    d,
+                    did_you_mean=(d, possible_values[name]),
+                )
+
+        if not result:
+            raise ValueError("Cannot find index entries matching %r" % (for_index,))
+
         return result
 
     def user_to_index(self, key, value, request, for_index):
@@ -250,9 +319,9 @@ class Client:
 
         CANONICAL = {
             "time": lambda x: str(canonical_time(x)),
-            "param": lambda x: str(x).lower(),
-            "type": lambda x: str(x).lower(),
-            "stream": lambda x: str(x).lower(),
+            # "param": lambda x: str(x).lower(),
+            # "type": lambda x: str(x).lower(),
+            # "stream": lambda x: str(x).lower(),
         }
 
         EXPAND_LIST = {
@@ -261,6 +330,22 @@ class Client:
         }
 
         OTHER_STEP = {"mmsa": "step"}
+
+        POSPROCESSING = {
+            "area",
+            "grid",
+            "rotation",
+            "frame",
+            "bitmap",
+            "gaussian",
+            "accuracy",
+            "format",
+        }
+
+        POSSIBLE_VALUES = {
+            "type": ["tf", "fc", "fcmean", "cf", "pf", "em", "ep", "es"],
+            "stream": ["oper", "wave", "scda", "scwv", "enfo", "waef", "mmsa"],
+        }
 
         if request is None:
             params = dict(**kwargs)
@@ -274,8 +359,13 @@ class Client:
 
         params.pop(OTHER_STEP.get(params["stream"], "fcmonth"), None)
 
+        postproc = POSPROCESSING.intersection(set(params.keys()))
+        if postproc:
+            warning_once("MARS post-processing keywords %r not supported", postproc)
+
         for_urls = defaultdict(list)
         for_index = defaultdict(list)
+        ignored = set()
 
         for k, v in list(params.items()):
             if isinstance(v, str):
@@ -292,6 +382,17 @@ class Client:
             if k.startswith("_"):
                 continue
 
+            if k in POSSIBLE_VALUES:
+                possible_values = POSSIBLE_VALUES[k]
+                for value in v:
+                    if value not in possible_values:
+                        warning_once(
+                            "Unknown value %r for keyword %r",
+                            value,
+                            k,
+                            did_you_mean=(value, possible_values),
+                        )
+
             if k in INDEX_COMPONENTS:
                 for values in [self.user_to_index(k, x, params, for_index) for x in v]:
                     if not isinstance(values, (list, tuple)):
@@ -307,6 +408,20 @@ class Client:
                     for value in values:
                         if value not in for_urls[k]:
                             for_urls[k].append(value)
+
+            if (
+                k not in URL_COMPONENTS
+                and k not in INDEX_COMPONENTS
+                and k not in POSPROCESSING
+            ):
+                ignored.add(k)
+
+        if ignored:
+            warning_once(
+                "The following keywords %r are ignored",
+                ignored,
+                did_you_mean=(list(ignored), URL_COMPONENTS + INDEX_COMPONENTS),
+            )
 
         if params.get("type") == "tf":
             for_index.clear()
@@ -327,7 +442,7 @@ class Client:
         }
         stream, time, type = args["stream"], args["_H"], args["type"]
 
-        if not self.auto_stream:
+        if not self.infer_stream_keyword:
             return stream
 
         stream = URL_STREAM_MAPPING.get((stream, time), stream)

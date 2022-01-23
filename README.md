@@ -1,6 +1,7 @@
 # ecmwf-opendata
 
 A package to download ECMWF open data.
+
 ```python
 from ecmwf.opendata import Client
 
@@ -12,15 +13,35 @@ client.retrieve(
     step=144,
     stream="waef",
     type="cf",
-    target="data.grib",
     param="mwd",
+    target="data.grib",
 )
 ```
 
 
 ## Options
 
-TODO
+The constructor of the client object takes the following options:
+
+```python
+client = Client(
+    source="ecmwf",
+    beta=True,
+    preserve_request_order=False,
+    infer_stream_keyword=True,
+)
+```
+
+where:
+
+- `source` is either the name of server to contact or a fully qualified URL. Possible values are `ecmwf` to access ECMWF's servers, or `azure` to access data hosted on Microsoft's Azure. Default is `ecmwf`.
+
+- `beta` is a boolean that indicates whether to access the beta or the prodcution version of the dataset. Current only `beta=True` is supported.
+
+- `preserve_request_order`. If this flag is set to `True`, the library will attempt to return to write the retrieved data into the target file following the order specified by the request. For example, if the request specifies `param=[2t,msl]` the libary will ensure that the field `2t` is first in the target file, while with `param=[msl,2t]`, the field `msl` will be first. This also works accross different keywords: `...,levelist=[500,100],param=[z,t],...` will produce a different output than `...,param=[z,t],levelist=[500,100],...`
+If it is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. **It is not recommanded to use that flag when dowloading a large number of fields.** Default is `False`.
+
+- `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge on how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the rigth value for the `stream` keyword based on the rest of the request. Default is `True`.
 
 ## Request syntax
 
