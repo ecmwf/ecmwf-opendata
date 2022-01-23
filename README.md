@@ -1,6 +1,9 @@
 # ecmwf-opendata
 
-A package to download ECMWF open data.
+A package to download ECMWF [open data]((https://www.ecmwf.int/en/forecasts/datasets/open-data)).
+
+https://www.ecmwf.int/en/forecasts/documentation-and-support/medium-range-forecasts
+https://www.ecmwf.int/en/forecasts/documentation-and-support/long-range
 
 ```python
 from ecmwf.opendata import Client
@@ -150,6 +153,23 @@ There are several way to specify the date and time in a request.
 ...
 ```
 
+Date can be specified as Python `datetime.datetime` or `datetime.date` objects:
+
+```python
+...
+    date=datetime.datetime(2022, 1, 25, 12, 0, 0),
+...
+```
+
+or
+
+```python
+...
+    date=datetime.date(2022, 1, 25),
+    time=12,
+...
+```
+
 The keyword `time` can be given as a string or an integer. All values of time below are equivalent:
 
 ```python
@@ -171,6 +191,7 @@ If `time` is not specified, the time is extracted from the date.
 
 If the `time` keyword is specified, it overrides any time given in the request.
 
+As stated above, if `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `download()` method.
 ### Stream and type
 
 ECMWF runs several forecasting systems that are referred to using the keywords
@@ -178,13 +199,201 @@ ECMWF runs several forecasting systems that are referred to using the keywords
 
 (See [`infer_stream_keyword`](#options))
 
+   <!-- "type": [
+        "cf",
+        "em",
+        "ep",
+        "es",
+        "fc",
+        "pf"
+    ],
+    "stream": [
+        "enfo",
+        "oper",
+        "scda",
+        "scwv",
+        "waef",
+        "wave"
+    ], -->
+
 ### Time steps
 
 ...
 
+ <!-- "step": [
+        "0",
+        "0-24",
+        "102",
+        "105",
+        "108",
+        "108-132",
+        "111",
+        "114",
+        "117",
+        "12",
+        "12-36",
+        "120",
+        "120-144",
+        "123",
+        "126",
+        "129",
+        "132",
+        "132-156",
+        "135",
+        "138",
+        "141",
+        "144",
+        "144-168",
+        "15",
+        "150",
+        "156",
+        "156-180",
+        "162",
+        "168",
+        "168-192",
+        "174",
+        "18",
+        "180",
+        "180-204",
+        "186",
+        "192",
+        "192-216",
+        "198",
+        "204",
+        "204-228",
+        "21",
+        "210",
+        "216",
+        "216-240",
+        "222",
+        "228",
+        "228-252",
+        "234",
+        "24",
+        "24-48",
+        "240",
+        "240-264",
+        "246",
+        "252",
+        "252-276",
+        "258",
+        "264",
+        "264-288",
+        "27",
+        "270",
+        "276",
+        "276-300",
+        "282",
+        "288",
+        "288-312",
+        "294",
+        "3",
+        "30",
+        "300",
+        "300-324",
+        "306",
+        "312",
+        "312-336",
+        "318",
+        "324",
+        "324-348",
+        "33",
+        "330",
+        "336",
+        "336-360",
+        "342",
+        "348",
+        "354",
+        "36",
+        "36-60",
+        "360",
+        "39",
+        "42",
+        "45",
+        "48",
+        "48-72",
+        "51",
+        "54",
+        "57",
+        "6",
+        "60",
+        "60-84",
+        "63",
+        "66",
+        "69",
+        "72",
+        "72-96",
+        "75",
+        "78",
+        "81",
+        "84",
+        "84-108",
+        "87",
+        "9",
+        "90",
+        "93",
+        "96",
+        "96-120",
+        "99" -->
+
 ### Parameters and levels
 
 For a complete list of parameters, refer to this [page](https://www.ecmwf.int/en/forecasts/datasets/open-data)
+
+  <!-- "1000",
+        "200",
+        "250",
+        "300",
+        "50",
+        "500",
+        "700",
+        "850",
+        "925" -->
+
+          <!-- "10fgg10",
+        "10fgg15",
+        "10fgg25",
+        "10u",
+        "10v",
+        "2t",
+        "d",
+        "gh",
+        "mp2",
+        "msl",
+        "mwd",
+        "mwp",
+        "pp1d",
+        "ptsa_gt_1p5stdev",
+        "ptsa_gt_1stdev",
+        "ptsa_gt_2stdev",
+        "ptsa_lt_1p5stdev",
+        "ptsa_lt_1stdev",
+        "ptsa_lt_2stdev",
+        "q",
+        "r",
+        "ro",
+        "skt",
+        "sp",
+        "st",
+        "swh",
+        "swhg2",
+        "swhg4",
+        "swhg6",
+        "swhg8",
+        "t",
+        "tcwv",
+        "tp",
+        "tpg1",
+        "tpg10",
+        "tpg100",
+        "tpg20",
+        "tpg25",
+        "tpg5",
+        "tpg50",
+        "u",
+        "v",
+        "vo",
+        "ws" -->
 
 ### Ensemble numbers
 
