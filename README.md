@@ -24,6 +24,8 @@ client.retrieve(
 The constructor of the client object takes the following options:
 
 ```python
+from ecmwf.opendata import Client
+
 client = Client(
     source="ecmwf",
     beta=True,
@@ -42,6 +44,100 @@ where:
 If it is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. **It is not recommanded to use that flag when dowloading a large number of fields.** Default is `False`.
 
 - `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge on how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the rigth value for the `stream` keyword based on the rest of the request. Default is `True`.
+
+## Methods
+
+The `Client.retrieve()` method takes request as input and will retrieve the corresponding data from the server and write them in the user's target file.
+
+A request is a list of keyword/value pairs use to select the desired data. It is possible to specify a list of values for a given keyword.
+
+The request can either be specified as a dictionary:
+
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf")
+
+request = {
+    "time": 0,
+    "type": "fc",
+    "step": 24,
+    "param": ["2t", "msl"],
+}
+
+client.retrieve(request, "data.grib2")
+
+# or:
+
+client.retrieve(
+    request=request,
+    target="data.grib2",
+)
+
+```
+
+or directly as arguments to the `retrieve()` method:
+
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf")
+
+client.retrieve(
+    time=0,
+    type="fc",
+    step=24,
+    param=["2t", "msl"],
+    target="data.grib2",
+)
+```
+
+The `date` and `time` keyword are used to select the date and time of the forecast run (see [Date and time](### Date and time) below). If `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `download()` method.
+
+
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf")
+
+result = client.retrieve(
+    type="fc",
+    step=24,
+    param=["2t", "msl"],
+    target="data.grib2",
+)
+
+print(result.datetime)
+
+```
+
+may print:
+
+```
+2022-01-23 00:00:00
+```
+
+The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forcast without downloading the data.
+
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf")
+
+print(client.latest(
+    type="fc",
+    step=24,
+    param=["2t", "msl"],
+    target="data.grib2",
+))
+
+```
+
+may print:
+
+```
+2022-01-23 00:00:00
+```
 
 ## Request syntax
 
