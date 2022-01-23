@@ -24,8 +24,6 @@ client.retrieve(
 The constructor of the client object takes the following options:
 
 ```python
-from ecmwf.opendata import Client
-
 client = Client(
     source="ecmwf",
     beta=True,
@@ -38,12 +36,12 @@ where:
 
 - `source` is either the name of server to contact or a fully qualified URL. Possible values are `ecmwf` to access ECMWF's servers, or `azure` to access data hosted on Microsoft's Azure. Default is `ecmwf`.
 
-- `beta` is a boolean that indicates whether to access the beta or the prodcution version of the dataset. Current only `beta=True` is supported.
+- `beta` is a boolean that indicates whether to access the beta or the production version of the dataset. Current only `beta=True` is supported.
 
-- `preserve_request_order`. If this flag is set to `True`, the library will attempt to return to write the retrieved data into the target file following the order specified by the request. For example, if the request specifies `param=[2t,msl]` the libary will ensure that the field `2t` is first in the target file, while with `param=[msl,2t]`, the field `msl` will be first. This also works accross different keywords: `...,levelist=[500,100],param=[z,t],...` will produce a different output than `...,param=[z,t],levelist=[500,100],...`
-If it is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. **It is not recommanded to use that flag when dowloading a large number of fields.** Default is `False`.
+- `preserve_request_order`. If this flag is set to `True`, the library will attempt to return to write the retrieved data into the target file following the order specified by the request. For example, if the request specifies `param=[2t,msl]` the library will ensure that the field `2t` is first in the target file, while with `param=[msl,2t]`, the field `msl` will be first. This also works across different keywords: `...,levelist=[500,100],param=[z,t],...` will produce a different output than `...,param=[z,t],levelist=[500,100],...`
+If it is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. **It is not recommended to use that flag when downloading a large number of fields.** Default is `False`.
 
-- `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge on how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the rigth value for the `stream` keyword based on the rest of the request. Default is `True`.
+- `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge on how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the right value for the `stream` keyword based on the rest of the request. Default is `True`.
 
 ## Methods
 
@@ -117,7 +115,7 @@ may print:
 2022-01-23 00:00:00
 ```
 
-The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forcast without downloading the data.
+The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forecast without downloading the data.
 
 ```python
 from ecmwf.opendata import Client
@@ -165,7 +163,8 @@ The keyword `time` can be given as a string or an integer. All values of time be
     time=1200,
     time='12',
     time='1200'
-...```
+...
+```
 
 If `time` is not specified, the time is extracted from the date.
 
@@ -179,7 +178,7 @@ If the `time` keyword is specified, it overrides any time given in the request.
 
 ### Stream and type
 
-ECMWF runs several foreacsting systems that are refered to using the keywords
+ECMWF runs several forecasting systems that are referred to using the keywords
 `stream` and `type`.
 
 ### Time steps
@@ -209,13 +208,11 @@ client.retrieve(
     param="2t",
     target="data.grib2",
 )
-
-
 ```
 
-- For HRES Atmospheric model products at time=06 or time=12, use `stream = "scda",`
+- For HRES Atmospheric model products at time=06 or time=12, use `stream="scda",`
 
-### Download the Tropical Cyclone tracks from ECMWF's 00UTC HRES forecast (Set I-iii)
+### Download the Tropical Cyclone tracks from ECMWF's 00UTC HRES forecast
 
 ```python
 from ecmwf.opendata import Client
@@ -257,7 +254,7 @@ client.retrieve(
 )
 ```
 
-- To download a single ensemble member, use the **number** keyword:  `number = [1,]`.
+- To download a single ensemble member, use the `number` keyword:  `number=1`.
 - All of the odd numbered ensemble members use `number = [num for num in range(1,51,2)]`.
 - To download the control member, use `type = "cf"`.
 
@@ -321,11 +318,10 @@ client.retrieve(
 
 ### Download the ensemble probability products
 
-The ensemble probability products are identified by the keyword `type
-= "ep"`.  The probability products are available only for time=00
-and time=12.
+The ensemble probability products are identified by the keyword `type="ep"`.  The probability products are available only for `time=00`
+and `time=12`.
 
-Two different productsa are available.
+Two different products are available.
 
 #### Probabilities - Instantaneous weather events - Pressure levels
 

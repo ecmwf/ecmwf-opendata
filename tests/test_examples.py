@@ -19,7 +19,7 @@ def example_list():
                 python = True
                 continue
             if python and line.startswith("```"):
-                if not any("..." in c for c in code):
+                if any("from ecmwf.opendata import Client" in c for c in code):
                     examples.append(code)
                 python = False
                 code = []
