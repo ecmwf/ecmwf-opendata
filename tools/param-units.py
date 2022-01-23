@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 import json
-import random
 import sys
-import traceback
 from collections import defaultdict
 
 import eccodes
 import requests
-from pandas import set_eng_float_format
 
 from ecmwf.opendata import Client
 

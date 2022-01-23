@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 import json
-import random
 import traceback
 from collections import defaultdict
 
-import eccodes
 import requests
 
 from ecmwf.opendata import Client
@@ -30,7 +28,7 @@ with open("index.txt") as f:
                     if not k.startswith("_"):
                         possible_values[k].add(v)
 
-        except Exception as e:
+        except Exception:
             print(traceback.format_exc())
 
 # print(possible_values)
