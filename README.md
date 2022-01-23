@@ -170,6 +170,16 @@ Date can be specified using strings, numbers and Python `datetime.datetime` or `
 ...
 ```
 
+Dates can also be given as a number less than or equal to zero. In this case, it is equivalent to the current UTC date minus the given number of days:
+
+```python
+...
+    date=0, # today
+    date=-1, # yesterday
+    date=-2, # the day before yesterday
+...
+```
+
 The keyword `time` can be given as a string or an integer, or a Python `datetime.time` object. All values of time below are equivalent:
 
 ```python
