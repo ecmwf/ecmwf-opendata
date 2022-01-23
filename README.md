@@ -50,7 +50,7 @@ If it is set to `False`, the library will sort the request to minimise the numbe
 
 - `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge on how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the right value for the `stream` keyword based on the rest of the request. Default is `True`.
 
- > ⚠️ **NOTE** It is  recommended **not** to set the `preserve_request_order` flag to `True` when downloading a large number of fields as this will add extra load on the servers.
+ > ⚠️ **NOTE:** It is  recommended **not** to set the `preserve_request_order` flag to `True` when downloading a large number of fields as this will add extra load on the servers.
 
 ## Methods
 
@@ -143,7 +143,7 @@ may print:
 2022-01-23 00:00:00
 ```
 
-> 📌 **NOTE**: The data is available between 7 and 9 hours after the forecast starting date and time, depending on the forecasting system and the time step specified.
+> ⏰ **NOTE**: The data is available between 7 and 9 hours after the forecast starting date and time, depending on the forecasting system and the time step specified.
 
 
 ## Request syntax
