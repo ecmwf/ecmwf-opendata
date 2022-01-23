@@ -426,6 +426,95 @@ ECMWF runs several forecasting systems that are referred to using the keywords
 
 For a complete list of parameters, refer to this [page](https://www.ecmwf.int/en/forecasts/datasets/open-data)
 
+> Atmospheric fields on pressure levels
+
+| Parameter | Description | Units |
+| --------- | ----------- | ----- |
+| d | Divergence | s<sup>-1</sup> |
+| gh | Geopotential height | gpm |
+| q | Specific humidity | kg kg<sup>-1</sup> |
+| r | Relative humidity | % |
+| t | Temperature | K |
+| u | U component of wind | m s<sup>-1</sup> |
+| v | V component of wind | m s<sup>-1</sup> |
+| vo | Vorticity (relative) | s<sup>-1</sup> |
+
+> Atmospheric fields on a single level
+
+| Parameter | Description | Units |
+| --------- | ----------- | ----- |
+| 10u | 10 metre U wind component | m s<sup>-1</sup> |
+| 10v | 10 metre V wind component | m s<sup>-1</sup> |
+| 2t | 2 metre temperature | K |
+| msl | Mean sea level pressure | Pa |
+| ro | Runoff | m |
+| skt | Skin temperature | K |
+| sp | Surface pressure | Pa |
+| st | Soil Temperature | K |
+| stl1 | Soil temperature level 1 | K |
+| tcwv | Total column vertically-integrated water vapour | kg m<sup>-2</sup> |
+| tp | Total Precipitation | kg m<sup>-2</sup> |
+
+> Ocean waves fields
+
+| Parameter | Description | Units |
+| --------- | ----------- | ----- |
+| mp2 | Mean zero-crossing wave period | s |
+| mwd | Mean wave direction | Degree true |
+| mwp | Mean wave period | s |
+| pp1d | Peak wave period | s |
+| swh | Significant height of combined wind waves and swell | m |
+
+> Ensemble mean and standard deviation - pressure levels
+
+| Parameter | Description | Units |
+| --------- | ----------- | ----- |
+| gh | Geopotential height | gpm |
+| t | Temperature | K |
+| ws | Wind speed | m s<sup>-1</sup> |
+
+> Ensemble mean and standard deviation - single level
+
+| Parameter | Description | Units |
+| --------- | ----------- | ----- |
+| msl | Mean sea level pressure | Pa |
+
+> Probabilities - atmospheric fields - 850 hPa
+
+| Parameter | Description | Units |
+| --------- | ----------- | ----- |
+| ptsa_gt_1p5stdev | Probability of temperature standardized anomaly greater than 1.5 standard deviation | % |
+| ptsa_gt_1stdev | Probability of temperature standardized anomaly greater than 1 standard deviation | % |
+| ptsa_gt_2stdev | Probability of temperature standardized anomaly greater than 2 standard deviation | % |
+| ptsa_lt_1p5stdev | Probability of temperature standardized anomaly less than -1.5 standard deviation | % |
+| ptsa_lt_1stdev | Probability of temperature standardized anomaly less than -1 standard deviation | % |
+| ptsa_lt_2stdev | Probability of temperature standardized anomaly less than -2 standard deviation | % |
+
+> Probabilities - atmospheric fields - single level
+
+| Parameter | Description | Units |
+| --------- | ----------- | ----- |
+| 10fgg10 | 10 metre wind gust of at least 10 m/s | % |
+| 10fgg15 | 10 metre wind gust of at least 15 m/s | % |
+| 10fgg25 | 10 metre wind gust of at least 25 m/s | % |
+| tpg1 | Total precipitation of at least 1 mm | % |
+| tpg10 | Total precipitation of at least 10 mm | % |
+| tpg100 | Total precipitation of at least 100 mm | % |
+| tpg20 | Total precipitation of at least 20 mm | % |
+| tpg25 | Total precipitation of at least 25 mm | % |
+| tpg5 | Total precipitation of at least 5 mm | % |
+| tpg50 | Total precipitation of at least 50 mm | % |
+
+> Probabilities - ocean waves fields
+
+| Parameter | Description | Units |
+| --------- | ----------- | ----- |
+| swhg2 | Significant wave height of at least 2 m | % |
+| swhg4 | Significant wave height of at least 4 m | % |
+| swhg6 | Significant wave height of at least 6 m | % |
+| swhg8 | Significant wave height of at least 8 m | % |
+
+
   <!-- "1000",
         "200",
         "250",
@@ -435,51 +524,6 @@ For a complete list of parameters, refer to this [page](https://www.ecmwf.int/en
         "700",
         "850",
         "925" -->
-
-<!-- "10fgg10",
-        "10fgg15",
-        "10fgg25",
-        "10u",
-        "10v",
-        "2t",
-        "d",
-        "gh",
-        "mp2",
-        "msl",
-        "mwd",
-        "mwp",
-        "pp1d",
-        "ptsa_gt_1p5stdev",
-        "ptsa_gt_1stdev",
-        "ptsa_gt_2stdev",
-        "ptsa_lt_1p5stdev",
-        "ptsa_lt_1stdev",
-        "ptsa_lt_2stdev",
-        "q",
-        "r",
-        "ro",
-        "skt",
-        "sp",
-        "st",
-        "swh",
-        "swhg2",
-        "swhg4",
-        "swhg6",
-        "swhg8",
-        "t",
-        "tcwv",
-        "tp",
-        "tpg1",
-        "tpg10",
-        "tpg100",
-        "tpg20",
-        "tpg25",
-        "tpg5",
-        "tpg50",
-        "u",
-        "v",
-        "vo",
-        "ws" -->
 
 ### Ensemble numbers
 
