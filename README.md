@@ -146,38 +146,43 @@ The date and time parameters refer to the starting time of the forecast. All dat
 
 There are several way to specify the date and time in a request.
 
+
+
+Date can be specified using strings, numbers and Python `datetime.datetime` or `datetime.date` objects:
+
 ```python
 ...
     date='20220125',
     time=12,
 ...
-```
-
-Date can be specified as Python `datetime.datetime` or `datetime.date` objects:
-
-```python
+    date='2022-01-25',
+    time=12,
+...
+    date='2022-01-25 12:00:00',
+...
+    date=20220125,
+    time=12,
 ...
     date=datetime.datetime(2022, 1, 25, 12, 0, 0),
-...
-```
-
-or
-
-```python
 ...
     date=datetime.date(2022, 1, 25),
     time=12,
 ...
 ```
 
-The keyword `time` can be given as a string or an integer. All values of time below are equivalent:
+The keyword `time` can be given as a string or an integer, or a Python `datetime.time` object. All values of time below are equivalent:
 
 ```python
 ...
     time=12,
+...
     time=1200,
+...
     time='12',
-    time='1200'
+...
+    time='1200',
+...
+    time=datetime.time(12),
 ...
 ```
 

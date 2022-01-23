@@ -20,8 +20,12 @@ def end_step(p):
 
 
 def canonical_time(time):
+    if isinstance(time, datetime.time):
+        assert datetime.time(time.hour) == time, time
+        return time.hour
     time = int(time)
     if time >= 100:
+        assert time % 100 == 0, time
         time //= 100
     return time
 
