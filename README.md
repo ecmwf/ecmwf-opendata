@@ -46,9 +46,11 @@ where:
 - `beta` is a boolean that indicates whether to access the beta or the production version of the dataset. Current only `beta=True` is supported.
 
 - `preserve_request_order`. If this flag is set to `True`, the library will attempt to return to write the retrieved data into the target file following the order specified by the request. For example, if the request specifies `param=[2t,msl]` the library will ensure that the field `2t` is first in the target file, while with `param=[msl,2t]`, the field `msl` will be first. This also works across different keywords: `...,levelist=[500,100],param=[z,t],...` will produce a different output than `...,param=[z,t],levelist=[500,100],...`
-If it is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. **⚠️ It is not recommended to use that flag when downloading a large number of fields.** Default is `False`.
+If it is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. Default is `False`.
 
 - `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge on how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the right value for the `stream` keyword based on the rest of the request. Default is `True`.
+
+ > ⚠️ **NOTE** It is  recommended **not** to set the `preserve_request_order` flag to `True` when downloading a large number of fields as this will add extra load on the servers.
 
 ## Methods
 
