@@ -1,15 +1,8 @@
 # ecmwf-opendata
 
-A package to download ECMWF [open data](https://www.ecmwf.int/en/forecasts/datasets/open-data).
+`ecmwf-opendata` is a package to simplify the download ECMWF [open data](https://www.ecmwf.int/en/forecasts/datasets/open-data). It implements a request-based interface to the dataset using ECMWF's MARS language tp select meteorological fields, similar to the existing  [ecmwf-api-client](https://github.com/ecmwf/ecmwf-api-client) Python package.
 
-
-
-<!--
-https://www.ecmwf.int/en/forecasts/documentation-and-support/medium-range-forecasts
-https://www.ecmwf.int/en/forecasts/documentation-and-support/long-range
--->
-
-
+The example below will download the latest available 10-day forecast for the *mean sea level pressure* (`msl`) into a local file called `data.grib2`:
 
 ```python
 from ecmwf.opendata import Client
@@ -17,17 +10,14 @@ from ecmwf.opendata import Client
 client = Client()
 
 client.retrieve(
-    date=-1,
-    time=6,
-    step=144,
-    stream="waef",
-    type="cf",
-    param="mwd",
-    target="data.grib",
+    step=240,
+    type="fc",
+    param="msl",
+    target="data.grib2",
 )
 ```
 
-> ❗ **NOTE:** This package is designed for users that want to download a subset of the whole dataset. If you plan to download a large percentage of each data file, it may be more efficient to download whole files and filter out the data you want locally. See the documentation on the [file naming convention](https://confluence.ecmwf.int/display/UDOC/ECMWF+Open+Data+-+Real+Time) for more information. Alternatively, you can use this tool to download whole files by only specifying `date`, `time`, `step` and `stream` and `type`.
+> ❗ **NOTE:** This package is designed for users that want to download a subset of the whole dataset. If you plan to download a large percentage of each data file, it may be more efficient to download whole files and filter out the data you want locally. See the documentation on the [file naming convention](https://confluence.ecmwf.int/display/UDOC/ECMWF+Open+Data+-+Real+Time) for more information. Alternatively, you can use this tool to download whole files by only specifying `date`, `time`, `step`, `stream` and `type`. Please be aware that all data for a full day is in the order of 726 GiB.
 
 ## Options
 
@@ -118,14 +108,10 @@ result = client.retrieve(
 
 print(result.datetime)
 ```
+may print `2022-01-23 00:00:00`.
 
-may print:
 
-```bash
-2022-01-23 00:00:00
-```
-
-The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forecast without downloading the data.
+The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forecast without downloading the data:
 
 ```python
 from ecmwf.opendata import Client
@@ -140,18 +126,29 @@ print(client.latest(
 ))
 ```
 
-may print:
-
-```bash
-2022-01-23 00:00:00
-```
+may print `2022-01-23 00:00:00`.
 
 > ⏰ **NOTE**: The data is available between 7 and 9 hours after the forecast starting date and time, depending on the forecasting system and the time step specified.
 
 
-## Request syntax
+## Request keywords
 
- This package uses a request syntax similar to the one used by [ecmwf-api-client](https://github.com/ecmwf/ecmwf-api-client).
+The supported keywords are:
+
+- `type`: the type of data (compulsory, default to `fc`).
+- `stream`: the forecast system (optional if unambiguous, compulsory otherwise). See the (`infer_stream_keyword`)[#options] above.
+- `date`: the date at which the forecast starts.
+- `time`: the time at which the forecast starts.
+- `step`: the forecast time step in hour, or `fcmonth`, the time step in months for the seasonal forecast (compulsory, default to `0` and `1` respectively).
+
+and (all optional, with no defaults):
+
+- `param`: the meteorological parameters, such as wind, pressure or humidity.
+- `levtype`: select between single level parameters and parameters on pressure levels.
+- `levelist`: the list of pressure levels when relevant.
+- `number`: the list of ensemble number when relevant.
+
+The keywords in the first list is used to identify which file to accessed, while the second list is used to identify which parts of the files need to be actually downloaded. Some HTTP servers are able to return multiple parts of a file, while other can only return a single part from a file. In the later case, the library may perform many HTTP requests to the server. If you wish to download whole files, only provide keywords from the first list.
 
 ### Date and time
 
@@ -487,6 +484,13 @@ For a complete list of parameters, refer to this [page](https://www.ecmwf.int/en
 ### Ensemble numbers
 
 ## Examples
+
+
+
+<!--
+https://www.ecmwf.int/en/forecasts/documentation-and-support/medium-range-forecasts
+https://www.ecmwf.int/en/forecasts/documentation-and-support/long-range
+-->
 
 ### Download a single surface parameter at a single forecast step from ECMWF's 00UTC HRES forecast
 
