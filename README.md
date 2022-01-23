@@ -1,9 +1,14 @@
 # ecmwf-opendata
 
-A package to download ECMWF [open data]((https://www.ecmwf.int/en/forecasts/datasets/open-data)).
+A package to download ECMWF [open data](https://www.ecmwf.int/en/forecasts/datasets/open-data).
 
+
+<!--
 https://www.ecmwf.int/en/forecasts/documentation-and-support/medium-range-forecasts
 https://www.ecmwf.int/en/forecasts/documentation-and-support/long-range
+-->
+
+
 
 ```python
 from ecmwf.opendata import Client
@@ -426,7 +431,7 @@ For a complete list of parameters, refer to this [page](https://www.ecmwf.int/en
         "850",
         "925" -->
 
-          <!-- "10fgg10",
+<!-- "10fgg10",
         "10fgg15",
         "10fgg25",
         "10u",
