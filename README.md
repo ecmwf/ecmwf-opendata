@@ -203,8 +203,29 @@ If `time` is not specified, the time is extracted from the date.
    date='2022-01-25 12:00:00',
 ...
 ```
+is equivalent to:
+```python
+...
+   date='2022-01-25',
+   time=0,
+...
+```
 
 If the `time` keyword is specified, it overrides any time given in the request.
+```python
+...
+   date='2022-01-25 12:00:00',
+   time=18,
+...
+```
+is equivalent to:
+```python
+...
+   date='2022-01-25',
+   time=18,
+...
+```
+
 
 As stated above, if `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `download()` method.
 ### Stream and type
