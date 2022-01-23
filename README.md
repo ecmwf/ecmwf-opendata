@@ -3,6 +3,7 @@
 A package to download ECMWF [open data](https://www.ecmwf.int/en/forecasts/datasets/open-data).
 
 
+
 <!--
 https://www.ecmwf.int/en/forecasts/documentation-and-support/medium-range-forecasts
 https://www.ecmwf.int/en/forecasts/documentation-and-support/long-range
@@ -25,6 +26,8 @@ client.retrieve(
     target="data.grib",
 )
 ```
+
+> ❗ **NOTE:** This package is designed for users that want to download a subset of the whole dataset. If you plan to download a large percentage of each data file, it may be more efficient to download whole files and filter out the data you want locally. See the documentation on the [file naming convention](https://confluence.ecmwf.int/display/UDOC/ECMWF+Open+Data+-+Real+Time) for more information. Alternatively, you can use this tool to download whole files by only specifying `date`, `time`, `step` and `stream` and `type`.
 
 ## Options
 
