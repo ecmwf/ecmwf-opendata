@@ -136,6 +136,9 @@ may print:
 2022-01-23 00:00:00
 ```
 
+> 📌 **NOTE**: The data is available between 7 and 9 hours after the forecast starting date and time, depending on the forecasting system and the time step specified.
+
+
 ## Request syntax
 
  This package uses a request syntax similar to the one used by [ecmwf-api-client](https://github.com/ecmwf/ecmwf-api-client).
@@ -227,7 +230,44 @@ is equivalent to:
 ```
 
 
-As stated above, if `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `download()` method.
+As stated before, if `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `download()` method:
+
+Example without the `date` keyword:
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf")
+
+result = client.retrieve(
+    time=12,
+    type="fc",
+    param="2t",
+    step="24",
+    target="data.grib2",
+)
+
+print(result.datetime)
+
+```
+will print `2022-01-22 12:00:00` if run in the morning of 2022-01-23.
+
+Example without the `date` and `time` keywords:
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf")
+
+result = client.retrieve(
+    type="fc",
+    param="2t",
+    step="24",
+    target="data.grib2",
+)
+
+print(result.datetime)
+
+```
+will print `2022-01-23 00:00:00` if run in the morning of 2022-01-23.
 ### Stream and type
 
 ECMWF runs several forecasting systems that are referred to using the keywords
