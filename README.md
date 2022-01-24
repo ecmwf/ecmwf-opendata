@@ -205,6 +205,9 @@ The keyword `time` can be given as a string or an integer, or a Python `datetime
     time=datetime.time(12),
 ...
 ```
+| List of valid values for time |
+| ----------------------------- |
+| 0, 6, 12 and 18 |
 
 If `time` is not specified, the time is extracted from the date.
 
@@ -304,126 +307,58 @@ ECMWF runs several forecasting systems that are referred to using the keywords
 
 ### Time steps
 
+To select a time step, use the `step` keyword:
 
-=0h to 144h by 3h, 144h to 360h by 6h 
+```python
+...
+   step=24,
+...
+   step=[24, 48],
+...
+```
+
+| Stream | Time | List of time steps |
+| -------- | ---- | ------------------ |
+| oper/wave | 00 and 12 | 0 to 144 by 3, 144 to 240 by 6 |
+| enfo/waef | 00 and 12 | 0 to 144 by 3, 144 to 360 by 6 |
+| oper/wave | 06 and 18 | 0 to 90 by 3 |
+| enfo/waef | 06 and 18 | 0 to 144 by 3 |
 
 ...
 
  <!-- "step": [
-        "0",
-        "0-24",
-        "102",
-        "105",
-        "108",
+
+        "0-24", "12-36", "24-48",
         "108-132",
-        "111",
-        "114",
-        "117",
-        "12",
-        "12-36",
-        "120",
         "120-144",
-        "123",
-        "126",
-        "129",
-        "132",
         "132-156",
-        "135",
-        "138",
-        "141",
-        "144",
         "144-168",
-        "15",
-        "150",
-        "156",
         "156-180",
-        "162",
-        "168",
         "168-192",
-        "174",
-        "18",
-        "180",
         "180-204",
-        "186",
-        "192",
         "192-216",
-        "198",
-        "204",
         "204-228",
-        "21",
-        "210",
-        "216",
         "216-240",
-        "222",
-        "228",
         "228-252",
-        "234",
-        "24",
-        "24-48",
-        "240",
         "240-264",
-        "246",
-        "252",
         "252-276",
-        "258",
-        "264",
         "264-288",
-        "27",
-        "270",
-        "276",
         "276-300",
-        "282",
-        "288",
         "288-312",
-        "294",
-        "3",
-        "30",
-        "300",
         "300-324",
-        "306",
-        "312",
         "312-336",
-        "318",
-        "324",
         "324-348",
-        "33",
-        "330",
-        "336",
         "336-360",
-        "342",
-        "348",
-        "354",
-        "36",
         "36-60",
-        "360",
-        "39",
-        "42",
-        "45",
-        "48",
         "48-72",
-        "51",
-        "54",
-        "57",
-        "6",
-        "60",
         "60-84",
-        "63",
-        "66",
-        "69",
-        "72",
         "72-96",
-        "75",
-        "78",
-        "81",
-        "84",
         "84-108",
-        "87",
-        "9",
-        "90",
-        "93",
-        "96",
         "96-120",
-        "99" -->
+
+        -->
+
+> 📌 **NOTE**: Not specifying `step` will return all available time steps.
 
 ### Parameters and levels
 
@@ -550,6 +485,28 @@ Below is the list of all parameters:
 
 
 ### Ensemble numbers
+
+You can select individual members of the ensemble forecast use the keyword `number`.
+
+```python
+...
+   stream="enfo",
+   step=24,
+   param="msl",
+   number=1,
+...
+   stream="enfo",
+   step=24,
+   param="msl",
+   number=[1, 10, 20],
+...
+```
+
+| List of ensemble numbers |
+| ----------------------------- |
+|   1 to 50 |
+
+> 📌 **NOTE**: Not specifying `number` will return all ensemble forecast members.
 
 ## Examples
 
