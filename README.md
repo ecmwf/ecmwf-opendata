@@ -293,25 +293,26 @@ ECMWF runs several forecasting systems that are referred to using the keywords
 - [ENS](https://confluence.ecmwf.int/display/FUG/ENS+-+Ensemble+Forecasts)
 - [SEAS](https://confluence.ecmwf.int/display/FUG/Long-Range+%28Seasonal%29+Forecast)
 
-(See [`infer_stream_keyword`](#options))
 
 Types are:
 
-- `cf`: control forecast
-- `em`: ensemble mean
-- `ep`: probabilities
-- `es`: ensemble standard deviation
-- `fc`: forecast
-- `pf`: perturbed forecast
+- `cf`: Control forecast.
+- `em`: Ensemble mean.
+- `ep`: Probabilities.
+- `es`: Ensemble standard deviation.
+- `fc`: Forecast.
+- `pf`: Perturbed forecast.
 
-Stream are:
+Streams are:
 
-- `oper`: xxxx
-- `wave`: xxxx
-- `enfo`: xxxx
-- `waef`: xxxx
-- `scda`: xxxx
-- `scwv`: xxxx
+- `oper`: Atmospheric fields from HRES - 00 UTC and 12 UTC.
+- `wave`: Ocean wave fields from HRES - 00 UTC and 12 UTC.
+- `enfo`: Atmospheric fields from ENS.
+- `waef`: Ocean wave fields from ENS.
+- `scda`: Atmospheric fields from HRES - 06 UTC and 18 UTC.
+- `scwv`: Ocean wave fields from HRES - 06 UTC and 18 UTC.
+
+> 📌 **NOTE**: if the client's flag [`infer_stream_keyword`](#options)) is set to `True`, the library will infer the stream from the `type` and `time`. In that case, you just need to specify `stream=wave` to access ocean wave products, and don't provide a value for `stream` in other cases.
 
 ### Time steps
 
