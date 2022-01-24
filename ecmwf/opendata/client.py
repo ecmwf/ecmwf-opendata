@@ -143,7 +143,7 @@ class Client:
         else:
             delta = datetime.timedelta(days=1)
 
-        date = full_date(0, params.get("time"))
+        date = full_date(0, params.get("time", 18))
 
         stop = date - datetime.timedelta(days=1, hours=6)
 
