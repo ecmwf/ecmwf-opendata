@@ -1,5 +1,3 @@
-import datetime
-
 from ecmwf.opendata import Client
 
 
