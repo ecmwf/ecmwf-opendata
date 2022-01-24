@@ -1,6 +1,6 @@
 # ecmwf-opendata
 
-`ecmwf-opendata` is a package to simplify the download ECMWF [open data](https://www.ecmwf.int/en/forecasts/datasets/open-data). It implements a request-based interface to the dataset using ECMWF's MARS language tp select meteorological fields, similar to the existing  [ecmwf-api-client](https://github.com/ecmwf/ecmwf-api-client) Python package.
+`ecmwf-opendata` is a package to simplify the download of ECMWF [open data](https://www.ecmwf.int/en/forecasts/datasets/open-data). It implements a request-based interface to the dataset using ECMWF's MARS language to select meteorological fields, similar to the existing  [ecmwf-api-client](https://github.com/ecmwf/ecmwf-api-client) Python package.
 
 The example below will download the latest available 10-day forecast for the *mean sea level pressure* (`msl`) into a local file called `data.grib2`:
 
@@ -38,10 +38,10 @@ where:
 
 - `beta` is a boolean that indicates whether to access the beta or the production version of the dataset. Current only `beta=True` is supported.
 
-- `preserve_request_order`. If this flag is set to `True`, the library will attempt to return to write the retrieved data into the target file following the order specified by the request. For example, if the request specifies `param=[2t,msl]` the library will ensure that the field `2t` is first in the target file, while with `param=[msl,2t]`, the field `msl` will be first. This also works across different keywords: `...,levelist=[500,100],param=[z,t],...` will produce a different output than `...,param=[z,t],levelist=[500,100],...`
-If it is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. Default is `False`.
+- `preserve_request_order`. If this flag is set to `True`, the library will attempt to write the retrieved data into the target file in the order specified by the request. For example, if the request specifies `param=[2t,msl]` the library will ensure that the field `2t` is first in the target file, while with `param=[msl,2t]`, the field `msl` will be first. This also works across different keywords: `...,levelist=[500,100],param=[z,t],...` will produce different output to `...,param=[z,t],levelist=[500,100],...`
+If the flag is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. Default is `False`.
 
-- `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge on how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the right value for the `stream` keyword based on the rest of the request. Default is `True`.
+- `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge of how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the correct value for the `stream` keyword based on the rest of the request. Default is `True`.
 
  > ⚠️ **NOTE:** It is  recommended **not** to set the `preserve_request_order` flag to `True` when downloading a large number of fields as this will add extra load on the servers.
 
@@ -49,7 +49,7 @@ If it is set to `False`, the library will sort the request to minimise the numbe
 
 The `Client.retrieve()` method takes request as input and will retrieve the corresponding data from the server and write them in the user's target file.
 
-A request is a list of keyword/value pairs use to select the desired data. It is possible to specify a list of values for a given keyword.
+A request is a list of keyword/value pairs used to select the desired data. It is possible to specify a list of values for a given keyword.
 
 The request can either be specified as a dictionary:
 
@@ -133,26 +133,26 @@ may print `2022-01-23 00:00:00`.
 
 The supported keywords are:
 
-- `type`: the type of data (compulsory, default to `fc`).
+- `type`: the type of data (compulsory, defaults to `fc`).
 - `stream`: the forecast system (optional if unambiguous, compulsory otherwise). See the `infer_stream_keyword` [above](#options).
 - `date`: the date at which the forecast starts.
 - `time`: the time at which the forecast starts.
-- `step`: the forecast time step in hour, or `fcmonth`, the time step in months for the seasonal forecast (compulsory, default to `0` and `1` respectively).
+- `step`: the forecast time step in hours, or `fcmonth`, the time step in months for the seasonal forecast (compulsory, default to `0` and `1`, respectively).
 
 and (all optional, with no defaults):
 
 - `param`: the meteorological parameters, such as wind, pressure or humidity.
 - `levtype`: select between single level parameters and parameters on pressure levels.
 - `levelist`: the list of pressure levels when relevant.
-- `number`: the list of ensemble number when relevant.
+- `number`: the list of ensemble member numbers when relevant.
 
-The keywords in the first list is used to identify which file to accessed, while the second list is used to identify which parts of the files need to be actually downloaded. Some HTTP servers are able to return multiple parts of a file, while other can only return a single part from a file. In the later case, the library may perform many HTTP requests to the server. If you wish to download whole files, only provide keywords from the first list.
+The keywords in the first list are used to identify which file to access, while the second list is used to identify which parts of the files need to be actually downloaded. Some HTTP servers are able to return multiple parts of a file, while other can only return a single part from a file. In the latter case, the library may perform many HTTP requests to the server. If you wish to download whole files, only provide keywords from the first list.
 
 ### Date and time
 
 The date and time parameters refer to the starting time of the forecast. All date and time are expressed in UTC.
 
-There are several way to specify the date and time in a request.
+There are several ways to specify the date and time in a request.
 
 Date can be specified using strings, numbers and Python `datetime.datetime` or `datetime.date` objects:
 
@@ -292,7 +292,7 @@ ECMWF runs several forecasting systems:
 - [ENS](https://confluence.ecmwf.int/display/FUG/ENS+-+Ensemble+Forecasts): Ensemble Forecasts.
 - [SEAS](https://confluence.ecmwf.int/display/FUG/Long-Range+%28Seasonal%29+Forecast): Long-Range (Seasonal) Forecast.
 
-Each of these forecasts also produces several types of products. that are referred to using the keywords
+Each of these forecasts also produces several types of products, that are referred to using the keywords
 `stream` and `type`.
 
 > Valid values for `type` are:
@@ -532,7 +532,7 @@ client.retrieve(
 ...
 ```
 
-> ❗ **NOTE:** Tropical cyclone tracks products are only available when there are tropical cyclones observed or forecasted.
+> ❗ **NOTE:** Tropical cyclone tracks products are only available when there are tropical cyclones observed or forecast.
 
 ### Download a single surface parameter at a single forecast step for all ensemble members from ECMWF's 12UTC 00UTC ENS forecast
 
