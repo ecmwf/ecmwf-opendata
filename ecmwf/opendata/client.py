@@ -439,6 +439,10 @@ class Client:
             ("wave", "ef"): "waef",
             ("oper", "ep"): "enfo",
             ("wave", "ep"): "waef",
+            ("scda", "ef"): "enfo",
+            ("scwv", "ef"): "waef",
+            ("scda", "ep"): "enfo",
+            ("scwv", "ep"): "waef",
         }
         stream, time, type = args["stream"], args["_H"], args["type"]
 

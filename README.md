@@ -285,6 +285,10 @@ will print `2022-01-23 00:00:00` if run in the morning of 2022-01-23.
 
 ECMWF runs several forecasting systems that are referred to using the keywords
 `stream` and `type`.
+(HRES)[https://confluence.ecmwf.int/display/FUG/HRES+-+High-Resolution+Forecast]
+
+https://confluence.ecmwf.int/display/FUG/ENS+-+Ensemble+Forecasts
+https://confluence.ecmwf.int/display/FUG/Long-Range+%28Seasonal%29+Forecast
 
 (See [`infer_stream_keyword`](#options))
 
@@ -319,8 +323,8 @@ To select a time step, use the `step` keyword:
 
 | Stream | Time | List of time steps |
 | -------- | ---- | ------------------ |
-| oper/wave | 00 and 12 | 0 to 144 by 3, 144 to 240 by 6 |
-| enfo/waef | 00 and 12 | 0 to 144 by 3, 144 to 360 by 6 |
+| HRES | 00 and 12 | 0 to 144 by 3, 144 to 240 by 6 |
+| ENS | 00 and 12 | 0 to 144 by 3, 144 to 360 by 6 |
 | oper/wave | 06 and 18 | 0 to 90 by 3 |
 | enfo/waef | 06 and 18 | 0 to 144 by 3 |
 
@@ -328,7 +332,15 @@ To select a time step, use the `step` keyword:
 
  <!-- "step": [
 
-        "0-24", "12-36", "24-48",
+        "0-24",
+        "12-36",
+        "24-48",
+        "36-60",
+        "48-72",
+        "60-84",
+        "72-96",
+        "84-108",
+        "96-120",
         "108-132",
         "120-144",
         "132-156",
@@ -349,12 +361,7 @@ To select a time step, use the `step` keyword:
         "312-336",
         "324-348",
         "336-360",
-        "36-60",
-        "48-72",
-        "60-84",
-        "72-96",
-        "84-108",
-        "96-120",
+
 
         -->
 
