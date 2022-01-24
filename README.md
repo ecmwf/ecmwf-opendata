@@ -286,24 +286,30 @@ will print `2022-01-23 00:00:00` if run in the morning of 2022-01-23.
 
 ### Stream and type
 
-ECMWF runs several forecasting systems that are referred to using the keywords
+ECMWF runs several forecasting systems:
+
+- [HRES](https://confluence.ecmwf.int/display/FUG/HRES+-+High-Resolution+Forecast): High Resolution Forecast.
+- [ENS](https://confluence.ecmwf.int/display/FUG/ENS+-+Ensemble+Forecasts): Ensemble Forecasts.
+- [SEAS](https://confluence.ecmwf.int/display/FUG/Long-Range+%28Seasonal%29+Forecast): Long-Range (Seasonal) Forecast.
+
+Each of these forecasts also produces several types of products. that are referred to using the keywords
 `stream` and `type`.
 
-- [HRES](https://confluence.ecmwf.int/display/FUG/HRES+-+High-Resolution+Forecast)
-- [ENS](https://confluence.ecmwf.int/display/FUG/ENS+-+Ensemble+Forecasts)
-- [SEAS](https://confluence.ecmwf.int/display/FUG/Long-Range+%28Seasonal%29+Forecast)
+> Valid values for `type` are:
 
+HRES:
 
-Types are:
+- `fc`: Forecast.
+
+ENS:
 
 - `cf`: Control forecast.
-- `em`: Ensemble mean.
-- `ep`: Probabilities.
-- `es`: Ensemble standard deviation.
-- `fc`: Forecast.
 - `pf`: Perturbed forecast.
+- `em`: Ensemble mean.
+- `es`: Ensemble standard deviation.
+- `ep`: Probabilities.
 
-Streams are:
+> Valid values for `stream` are:
 
 - `oper`: Atmospheric fields from HRES - 00 UTC and 12 UTC.
 - `wave`: Ocean wave fields from HRES - 00 UTC and 12 UTC.
@@ -332,7 +338,8 @@ To select a time step, use the `step` keyword:
 | ENS | 00 and 12 | 0 to 144 by 3, 144 to 360 by 6 |
 | HRES | 06 and 18 | 0 to 90 by 3 |
 | ENS | 06 and 18 | 0 to 144 by 3 |
-| Probabilities | 00 and 12 | 0-24 to 336-360 by 12 |
+| Probabilities - Instantaneous weather events | 00 and 12 | 0 to 360 by 12 |
+| Probabilities - Daily weather events | 00 and 12 | 0-24 to 336-360 by 12 |
 
 > 📌 **NOTE**: Not specifying `step` will return all available time steps.
 
@@ -422,7 +429,7 @@ Below is the list of all parameters:
 | --------- | ----------- | ----- |
 | msl | Mean sea level pressure | Pa |
 
-> Probabilities - atmospheric fields - 850 hPa
+> Instantaneous weather events - atmospheric fields - 850 hPa
 
 | Parameter | Description | Units |
 | --------- | ----------- | ----- |
@@ -433,7 +440,7 @@ Below is the list of all parameters:
 | ptsa_lt_1stdev | Probability of temperature standardized anomaly less than -1 standard deviation | % |
 | ptsa_lt_2stdev | Probability of temperature standardized anomaly less than -2 standard deviation | % |
 
-> Probabilities - atmospheric fields - single level
+> Daily weather events - atmospheric fields - single level
 
 | Parameter | Description | Units |
 | --------- | ----------- | ----- |
@@ -448,7 +455,7 @@ Below is the list of all parameters:
 | tpg5 | Total precipitation of at least 5 mm | % |
 | tpg50 | Total precipitation of at least 50 mm | % |
 
-> Probabilities - ocean waves fields
+> Daily weather events - ocean waves fields
 
 | Parameter | Description | Units |
 | --------- | ----------- | ----- |
@@ -500,9 +507,7 @@ client.retrieve(
 )
 ```
 
-- For HRES Atmospheric model products at time=06 or time=12, use `stream="scda",`
-
-### Download the Tropical Cyclone tracks from ECMWF's 00UTC HRES forecast
+### Download the tropical cyclone tracks from ECMWF's 00UTC HRES forecast
 
 ```python
 from ecmwf.opendata import Client
@@ -523,30 +528,31 @@ client.retrieve(
 
 ```python
 ...
-   stream = "scda",
    step = 90,
 ...
 ```
+
+> ❗ **NOTE:** Tropical cyclone tracks products are only available when there are tropical cyclones observed or forecasted.
 
 ### Download a single surface parameter at a single forecast step for all ensemble members from ECMWF's 12UTC 00UTC ENS forecast
 
 ```python
 from ecmwf.opendata import Client
 
-client = Client(source = "ecmwf")
+client = Client(source="ecmwf")
 
 client.retrieve(
-   time = 0,
-   stream = "enfo",
-   type = "pf",
-   param = "msl",
-   target = "data.grib2"
+    time=0,
+    stream="enfo",
+    type="pf",
+    param="msl",
+    target="data.grib2",
 )
 ```
 
 - To download a single ensemble member, use the `number` keyword:  `number=1`.
-- All of the odd numbered ensemble members use `number = [num for num in range(1,51,2)]`.
-- To download the control member, use `type = "cf"`.
+- All of the odd numbered ensemble members use `number=[num for num in range(1,51,2)]`.
+- To download the control member, use `type="cf"`.
 
 ### Download the Tropical Cyclone tracks from ECMWF's 00UTC ENS forecast
 
@@ -564,11 +570,10 @@ client.retrieve(
     step=240,
     target="data.bufr",
 )
-
 ```
 
 - The downloaded data are encoded in BUFR edition 4
-- For the ENS Tropical Cyclone tracks at time=06 and time=18 replace `step = [240,]` with `step = [144,]`.
+- For the ENS Tropical Cyclone tracks at time=06 and time=18 replace `step=240` with `step=144`.
 
 ### Download the ensemble mean and standard deviation for all parameters at a single forecast step from ECMWF's 00UTC ENS forecast
 
@@ -586,10 +591,9 @@ client.retrieve(
     step=24,
     target="data.grib2",
 )
-
 ```
 
-and `type = "es"`, respectively:
+and `type="es"`, respectively:
 
 ```python
 from ecmwf.opendata import Client
@@ -608,8 +612,7 @@ client.retrieve(
 
 ### Download the ensemble probability products
 
-The ensemble probability products are identified by the keyword `type="ep"`.  The probability products are available only for `time=00`
-and `time=12`.
+The ensemble probability products are identified by the keyword `type="ep"`.  The probability products are available only for `time=00` and `time=12`.
 
 Two different products are available.
 
@@ -628,7 +631,6 @@ client.retrieve(
     stream="enfo",
     type="ep",
     step=[i for i in range(12, 361, 12)],
-    levtype="pl",
     levelist=850,
     param=[
         "ptsa_gt_1stdev",
@@ -640,12 +642,11 @@ client.retrieve(
     ],
     target="data.grib2",
 )
-
 ```
 
 #### Probabilities - Daily weather events - Single level
 
-The probabilities of total precipitation and wind gusts exceeding specified thresholds in a 24 hour period are available for step ranges 0-24 to 336-360 by 12​​.  These are specified in the retrieval request using, e.g.: `step = ["0-24", "12-36", "24-48"]`.
+The probabilities of total precipitation and wind gusts exceeding specified thresholds in a 24 hour period are available for step ranges 0-24 to 336-360 by 12​​.  These are specified in the retrieval request using, e.g.: `step=["0-24", "12-36", "24-48"]`.
 
 ```python
 from ecmwf.opendata import Client
@@ -659,11 +660,9 @@ client.retrieve(
     stream="enfo",
     type="ep",
     step=steps,
-    levtype="sfc",
     param=["tpg1", "tpg5", "10fgg10"],
     target="data.grib2",
 )
-
 ```
 
 ### ECMWF open data license

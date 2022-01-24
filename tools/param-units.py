@@ -27,9 +27,17 @@ GROUPS = {
     ("enfo", "es", "pl"): "04 Ensemble mean and standard deviation - pressure levels",
     ("enfo", "em", "sfc"): "05 Ensemble mean and standard deviation - single level",
     ("enfo", "es", "sfc"): "05 Ensemble mean and standard deviation - single level",
-    ("enfo", "ep", "pl"): "07 Probabilities - atmospheric fields - 850 hPa",
-    ("enfo", "ep", "sfc"): "08 Probabilities - atmospheric fields - single level",
-    ("waef", "ep", "sfc"): "10 Probabilities - ocean waves fields",
+    (
+        "enfo",
+        "ep",
+        "pl",
+    ): "07 Instantaneous weather events - atmospheric fields - 850 hPa",
+    (
+        "enfo",
+        "ep",
+        "sfc",
+    ): "08 Daily weather events - atmospheric fields - single level",
+    ("waef", "ep", "sfc"): "10 Daily weather events - ocean waves fields",
 }
 
 groups = defaultdict(set)
