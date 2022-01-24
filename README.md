@@ -93,7 +93,6 @@ client.retrieve(
 
 The `date` and `time` keyword are used to select the date and time of the forecast run (see [Date and time](#date-and-time) below). If `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `download()` method.
 
-
 ```python
 from ecmwf.opendata import Client
 
@@ -108,8 +107,8 @@ result = client.retrieve(
 
 print(result.datetime)
 ```
-may print `2022-01-23 00:00:00`.
 
+may print `2022-01-23 00:00:00`.
 
 The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forecast without downloading the data:
 
@@ -130,13 +129,12 @@ may print `2022-01-23 00:00:00`.
 
 > ⏰ **NOTE**: The data is available between 7 and 9 hours after the forecast starting date and time, depending on the forecasting system and the time step specified.
 
-
 ## Request keywords
 
 The supported keywords are:
 
 - `type`: the type of data (compulsory, default to `fc`).
-- `stream`: the forecast system (optional if unambiguous, compulsory otherwise). See the (`infer_stream_keyword`)[#options] above.
+- `stream`: the forecast system (optional if unambiguous, compulsory otherwise). See the `infer_stream_keyword` [above](#options).
 - `date`: the date at which the forecast starts.
 - `time`: the time at which the forecast starts.
 - `step`: the forecast time step in hour, or `fcmonth`, the time step in months for the seasonal forecast (compulsory, default to `0` and `1` respectively).
@@ -155,8 +153,6 @@ The keywords in the first list is used to identify which file to accessed, while
 The date and time parameters refer to the starting time of the forecast. All date and time are expressed in UTC.
 
 There are several way to specify the date and time in a request.
-
-
 
 Date can be specified using strings, numbers and Python `datetime.datetime` or `datetime.date` objects:
 
@@ -205,6 +201,7 @@ The keyword `time` can be given as a string or an integer, or a Python `datetime
     time=datetime.time(12),
 ...
 ```
+
 | List of valid values for time |
 | ----------------------------- |
 | 0, 6, 12 and 18 |
@@ -216,7 +213,9 @@ If `time` is not specified, the time is extracted from the date.
    date='2022-01-25 12:00:00',
 ...
 ```
+
 is equivalent to:
+
 ```python
 ...
    date='2022-01-25',
@@ -225,13 +224,16 @@ is equivalent to:
 ```
 
 If the `time` keyword is specified, it overrides any time given in the request.
+
 ```python
 ...
    date='2022-01-25 12:00:00',
    time=18,
 ...
 ```
+
 is equivalent to:
+
 ```python
 ...
    date='2022-01-25',
@@ -239,10 +241,10 @@ is equivalent to:
 ...
 ```
 
-
 As stated before, if `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `download()` method:
 
 Example without the `date` keyword:
+
 ```python
 from ecmwf.opendata import Client
 
@@ -259,6 +261,7 @@ result = client.retrieve(
 print(result.datetime)
 
 ```
+
 will print `2022-01-22 12:00:00` if run in the morning of 2022-01-23.
 
 Example without the `date` and `time` keywords:
@@ -285,7 +288,7 @@ will print `2022-01-23 00:00:00` if run in the morning of 2022-01-23.
 
 ECMWF runs several forecasting systems that are referred to using the keywords
 `stream` and `type`.
-(HRES)[https://confluence.ecmwf.int/display/FUG/HRES+-+High-Resolution+Forecast]
+[HRES](https://confluence.ecmwf.int/display/FUG/HRES+-+High-Resolution+Forecast)
 
 https://confluence.ecmwf.int/display/FUG/ENS+-+Ensemble+Forecasts
 https://confluence.ecmwf.int/display/FUG/Long-Range+%28Seasonal%29+Forecast
@@ -321,49 +324,13 @@ To select a time step, use the `step` keyword:
 ...
 ```
 
-| Stream | Time | List of time steps |
+| Forecasting system | Time | List of time steps |
 | -------- | ---- | ------------------ |
 | HRES | 00 and 12 | 0 to 144 by 3, 144 to 240 by 6 |
 | ENS | 00 and 12 | 0 to 144 by 3, 144 to 360 by 6 |
-| oper/wave | 06 and 18 | 0 to 90 by 3 |
-| enfo/waef | 06 and 18 | 0 to 144 by 3 |
-
-...
-
- <!-- "step": [
-
-        "0-24",
-        "12-36",
-        "24-48",
-        "36-60",
-        "48-72",
-        "60-84",
-        "72-96",
-        "84-108",
-        "96-120",
-        "108-132",
-        "120-144",
-        "132-156",
-        "144-168",
-        "156-180",
-        "168-192",
-        "180-204",
-        "192-216",
-        "204-228",
-        "216-240",
-        "228-252",
-        "240-264",
-        "252-276",
-        "264-288",
-        "276-300",
-        "288-312",
-        "300-324",
-        "312-336",
-        "324-348",
-        "336-360",
-
-
-        -->
+| HRES | 06 and 18 | 0 to 90 by 3 |
+| ENS | 06 and 18 | 0 to 144 by 3 |
+| Probabilities | 00 and 12 | 0-24 to 336-360 by 12 |
 
 > 📌 **NOTE**: Not specifying `step` will return all available time steps.
 
@@ -488,9 +455,6 @@ Below is the list of all parameters:
 | swhg6 | Significant wave height of at least 6 m | % |
 | swhg8 | Significant wave height of at least 8 m | % |
 
-
-
-
 ### Ensemble numbers
 
 You can select individual members of the ensemble forecast use the keyword `number`.
@@ -516,13 +480,6 @@ You can select individual members of the ensemble forecast use the keyword `numb
 > 📌 **NOTE**: Not specifying `number` will return all ensemble forecast members.
 
 ## Examples
-
-
-
-<!--
-https://www.ecmwf.int/en/forecasts/documentation-and-support/medium-range-forecasts
-https://www.ecmwf.int/en/forecasts/documentation-and-support/long-range
--->
 
 ### Download a single surface parameter at a single forecast step from ECMWF's 00UTC HRES forecast
 
@@ -658,7 +615,6 @@ Two different products are available.
 
 The probability of temperature standardized anomalies at a constant
 pressure level of 850hPa are available at 12 hourly forecast steps.
-
 
 ```python
 from ecmwf.opendata import Client

@@ -367,7 +367,15 @@ class Client:
         for_index = defaultdict(list)
         ignored = set()
 
-        for k, v in list(params.items()):
+        def sorter(kv):
+            a = kv[0]
+            if a in URL_COMPONENTS:
+                return URL_COMPONENTS.index(a)
+            if a in INDEX_COMPONENTS:
+                return INDEX_COMPONENTS.index(a) + len(URL_COMPONENTS)
+            return len(URL_COMPONENTS) + len(INDEX_COMPONENTS)
+
+        for k, v in sorted(params.items(), key=sorter):
             if isinstance(v, str):
                 v = v.split("/")
 
