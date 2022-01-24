@@ -288,29 +288,30 @@ will print `2022-01-23 00:00:00` if run in the morning of 2022-01-23.
 
 ECMWF runs several forecasting systems that are referred to using the keywords
 `stream` and `type`.
-[HRES](https://confluence.ecmwf.int/display/FUG/HRES+-+High-Resolution+Forecast)
 
-https://confluence.ecmwf.int/display/FUG/ENS+-+Ensemble+Forecasts
-https://confluence.ecmwf.int/display/FUG/Long-Range+%28Seasonal%29+Forecast
+- [HRES](https://confluence.ecmwf.int/display/FUG/HRES+-+High-Resolution+Forecast)
+- [ENS](https://confluence.ecmwf.int/display/FUG/ENS+-+Ensemble+Forecasts)
+- [SEAS](https://confluence.ecmwf.int/display/FUG/Long-Range+%28Seasonal%29+Forecast)
 
 (See [`infer_stream_keyword`](#options))
 
-   <!-- "type": [
-        "cf",
-        "em",
-        "ep",
-        "es",
-        "fc",
-        "pf"
-    ],
-    "stream": [
-        "enfo",
-        "oper",
-        "scda",
-        "scwv",
-        "waef",
-        "wave"
-    ], -->
+Types are:
+
+- `cf`: control forecast
+- `em`: ensemble mean
+- `ep`: probabilities
+- `es`: ensemble standard deviation
+- `fc`: forecast
+- `pf`: perturbed forecast
+
+Stream are:
+
+- `oper`: xxxx
+- `wave`: xxxx
+- `enfo`: xxxx
+- `waef`: xxxx
+- `scda`: xxxx
+- `scwv`: xxxx
 
 ### Time steps
 
