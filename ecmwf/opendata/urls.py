@@ -17,7 +17,7 @@ URLS = {}
 
 if os.path.exists(DOT_ECMWF_OPENDATA):
     with open(DOT_ECMWF_OPENDATA) as f:
-        URLS = json.load(f)
+        URLS.update(json.load(f))
 
 if "ECMWF_OPENDATA_URLS" in os.environ:
-    URLS = json.loads(os.environ["ECMWF_OPENDATA_URLS"])
+    URLS.update(json.loads(os.environ["ECMWF_OPENDATA_URLS"]))
