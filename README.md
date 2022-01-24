@@ -455,7 +455,7 @@ Below is the list of all parameters:
 | tpg5 | Total precipitation of at least 5 mm | % |
 | tpg50 | Total precipitation of at least 50 mm | % |
 
-> Daily weather events - ocean waves fields
+> Instantaneous weather events - ocean waves fields
 
 | Parameter | Description | Units |
 | --------- | ----------- | ----- |

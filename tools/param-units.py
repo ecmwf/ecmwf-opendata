@@ -37,7 +37,7 @@ GROUPS = {
         "ep",
         "sfc",
     ): "08 Daily weather events - atmospheric fields - single level",
-    ("waef", "ep", "sfc"): "10 Daily weather events - ocean waves fields",
+    ("waef", "ep", "sfc"): "10 Instantaneous weather events - ocean waves fields",
 }
 
 groups = defaultdict(set)
