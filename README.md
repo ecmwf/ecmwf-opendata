@@ -304,6 +304,9 @@ ECMWF runs several forecasting systems that are referred to using the keywords
 
 ### Time steps
 
+
+=0h to 144h by 3h, 144h to 360h by 6h 
+
 ...
 
  <!-- "step": [
@@ -424,7 +427,36 @@ ECMWF runs several forecasting systems that are referred to using the keywords
 
 ### Parameters and levels
 
-For a complete list of parameters, refer to this [page](https://www.ecmwf.int/en/forecasts/datasets/open-data)
+To select a parameter, use the `param` keyword:
+
+```python
+...
+   param="msl",
+...
+   param=["2t", "msl"]
+...
+```
+
+for pressure level parameters, use the `levelist` keyword:
+
+```python
+...
+   param="t",
+   levelist=850,
+...
+   param=["u", "v"],
+   levelist=[1000, 850, 500],
+...
+```
+
+> 📌 **NOTE**: Not specifying `levelist` will return all available levels, and not specifying `param` will return all available parameters.
+
+| List of pressure levels (hPa) |
+| ----------------------------- |
+|   1000, 925, 850, 700, 500, 300, 250, 200 and 50 |
+
+
+Below is the list of all parameters:
 
 > Atmospheric fields on pressure levels
 
@@ -515,15 +547,7 @@ For a complete list of parameters, refer to this [page](https://www.ecmwf.int/en
 | swhg8 | Significant wave height of at least 8 m | % |
 
 
-  <!-- "1000",
-        "200",
-        "250",
-        "300",
-        "50",
-        "500",
-        "700",
-        "850",
-        "925" -->
+
 
 ### Ensemble numbers
 
