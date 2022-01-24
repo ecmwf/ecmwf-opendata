@@ -2,6 +2,8 @@
 
 `ecmwf-opendata` is a package to simplify the download of ECMWF [open data](https://www.ecmwf.int/en/forecasts/datasets/open-data). It implements a request-based interface to the dataset using ECMWF's MARS language to select meteorological fields, similar to the existing  [ecmwf-api-client](https://github.com/ecmwf/ecmwf-api-client) Python package.
 
+A collection of Jupyter Notebooks that make use of that package is available [here](https://github.com/ecmwf/notebook-examples/tree/master/opencharts).
+
 The example below will download the latest available 10-day forecast for the *mean sea level pressure* (`msl`) into a local file called `data.grib2`:
 
 ```python
@@ -18,6 +20,7 @@ client.retrieve(
 ```
 
 > ❗ **NOTE:** This package is designed for users that want to download a subset of the whole dataset. If you plan to download a large percentage of each data file, it may be more efficient to download whole files and filter out the data you want locally. See the documentation on the [file naming convention](https://confluence.ecmwf.int/display/UDOC/ECMWF+Open+Data+-+Real+Time) for more information. Alternatively, you can use this tool to download whole files by only specifying `date`, `time`, `step`, `stream` and `type`. Please be aware that all data for a full day is in the order of 726 GiB.
+
 
 ## Options
 
