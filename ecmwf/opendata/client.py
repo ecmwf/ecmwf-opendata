@@ -294,13 +294,26 @@ class Client:
         return FOR_URL.get((key, value), value)
 
     def prepare_request(self, request=None, **kwargs):
-        DEFAULTS = dict(
+        DEFAULTS_FC = dict(
             resol="0p4-beta" if self.beta else "0p4",
             type="fc",
             stream="oper",
             step=0,
             fcmonth=1,
         )
+
+        DEFAULTS_EF = dict(
+            resol="0p4-beta" if self.beta else "0p4",
+            type=["cf", "pf"],
+            stream="enfo",
+            step=0,
+            fcmonth=1,
+        )
+
+        DEFAULTS = {
+            "enfo": DEFAULTS_EF,
+            "waef": DEFAULTS_EF,
+        }
 
         URL_COMPONENTS = (
             "date",
@@ -357,7 +370,8 @@ class Client:
         else:
             params = dict(**request)
 
-        for key, value in DEFAULTS.items():
+        defaults = DEFAULTS.get(params.get("stream"), DEFAULTS_FC)
+        for key, value in defaults.items():
             params.setdefault(key, value)
 
         params.pop("target", None)

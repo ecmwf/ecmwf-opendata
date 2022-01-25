@@ -13,7 +13,10 @@ import os
 
 DOT_ECMWF_OPENDATA = os.path.expanduser("~/.ecmwf-opendata")
 
-URLS = {}
+URLS = {
+    "ecmwf": "https://data.ecmwf.int/forecasts",
+    "azure": "https://ai4edataeuwest.blob.core.windows.net/ecmwf",
+}
 
 if os.path.exists(DOT_ECMWF_OPENDATA):
     with open(DOT_ECMWF_OPENDATA) as f:

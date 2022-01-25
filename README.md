@@ -50,6 +50,8 @@ If the flag is set to `False`, the library will sort the request to minimise the
 
 ## Methods
 
+> `Client.retrieve()`
+
 The `Client.retrieve()` method takes request as input and will retrieve the corresponding data from the server and write them in the user's target file.
 
 A request is a list of keyword/value pairs used to select the desired data. It is possible to specify a list of values for a given keyword.
@@ -112,6 +114,28 @@ print(result.datetime)
 ```
 
 may print `2022-01-23 00:00:00`.
+
+> `Client.download()`
+
+The `Client.download()` method takes the same parameters as the `Client.retrieve()` method, but will download the whole data files from the server, ignoring keywords like `param`, `levelist` or `number`.
+
+The example below will download all field from the latest time step 24, ignoring the keyword `param`vi tes  :
+
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf")
+
+client.download(
+    param="msl",
+    type="fc",
+    step=24,
+    target="data.grib2",
+)
+
+```
+
+> `Client.latest()`
 
 The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forecast without downloading the data:
 
