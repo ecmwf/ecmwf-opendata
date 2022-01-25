@@ -25,6 +25,8 @@ jobs:
       - run: flake8 .
 
   checks:
+    if: ${{ github.event_name == 'release' }}
+
     strategy:
       fail-fast: false
       matrix:
