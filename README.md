@@ -96,7 +96,7 @@ client.retrieve(
 )
 ```
 
-The `date` and `time` keyword are used to select the date and time of the forecast run (see [Date and time](#date-and-time) below). If `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `download()` method.
+The `date` and `time` keyword are used to select the date and time of the forecast run (see [Date and time](#date-and-time) below). If `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `retrieve()` method.
 
 ```python
 from ecmwf.opendata import Client
@@ -119,7 +119,7 @@ may print `2022-01-23 00:00:00`.
 
 The `Client.download()` method takes the same parameters as the `Client.retrieve()` method, but will download the whole data files from the server, ignoring keywords like `param`, `levelist` or `number`.
 
-The example below will download all field from the latest time step 24, ignoring the keyword `param`vi tes  :
+The example below will download all field from the latest time step 24, ignoring the keyword `param`:
 
 ```python
 from ecmwf.opendata import Client
@@ -268,7 +268,7 @@ is equivalent to:
 ...
 ```
 
-As stated before, if `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `download()` method:
+As stated before, if `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `retrieve()` method:
 
 Example without the `date` keyword:
 
@@ -345,7 +345,7 @@ ENS:
 - `scda`: Atmospheric fields from HRES - 06 UTC and 18 UTC.
 - `scwv`: Ocean wave fields from HRES - 06 UTC and 18 UTC.
 
-> 📌 **NOTE**: if the client's flag [`infer_stream_keyword`](#options)) is set to `True`, the library will infer the stream from the `type` and `time`. In that case, you just need to specify `stream=wave` to access ocean wave products, and don't provide a value for `stream` in other cases.
+> 📌 **NOTE**: if the client's flag [`infer_stream_keyword`](#options) is set to `True`, the library will infer the stream from the `type` and `time`. In that case, you just need to specify `stream=wave` to access ocean wave products, and don't provide a value for `stream` in other cases.
 
 ### Time steps
 
@@ -583,7 +583,7 @@ client.retrieve(
 
 ### Download the Tropical Cyclone tracks from ECMWF's 00UTC ENS forecast
 
-The Tropical Cyclone tracks are identified by the keyword `type = "tf"`.
+The Tropical Cyclone tracks are identified by the keyword `type="tf"`.
 
 ```python
 from ecmwf.opendata import Client
@@ -604,7 +604,7 @@ client.retrieve(
 
 ### Download the ensemble mean and standard deviation for all parameters at a single forecast step from ECMWF's 00UTC ENS forecast
 
-The ensemble mean and standard deviation are identified by the keywords `type = "em"`:
+The ensemble mean and standard deviation are identified by the keywords `type="em"`:
 
 ```python
 from ecmwf.opendata import Client
