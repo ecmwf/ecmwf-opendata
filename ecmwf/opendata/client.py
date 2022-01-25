@@ -132,6 +132,11 @@ class Client:
         result.size = download(result.urls, target=result.target)
         return result
 
+    def download(self, request=None, target=None, **kwargs):
+        result = self._get_urls(request, target=target, use_index=False, **kwargs)
+        result.size = download(result.urls, target=result.target)
+        return result
+
     def latest(self, request=None, **kwargs):
         if request is None:
             params = dict(**kwargs)
