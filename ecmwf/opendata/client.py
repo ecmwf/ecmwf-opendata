@@ -123,6 +123,14 @@ class Client:
             if self.source.startswith("http://") or self.source.startswith("https://"):
                 self._url = self.source
             else:
+                if self.source not in URLS:
+                    warning_once(
+                        "Unknown source %r. Known sources are %r",
+                        self.source,
+                        list(URLS.keys()),
+                        did_you_mean=(self.source, list(URLS.keys())),
+                    )
+                    raise ValueError("Unknown source %r" % (self.source,))
                 self._url = URLS[self.source]
 
         return self._url
