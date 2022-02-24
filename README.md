@@ -430,7 +430,7 @@ Below is the list of all parameters:
 | st | Soil Temperature | K |
 | stl1 | Soil temperature level 1 | K |
 | tcwv | Total column vertically-integrated water vapour | kg m<sup>-2</sup> |
-| tp | Total Precipitation | kg m<sup>-2</sup> |
+| tp | Total Precipitation | m |
 
 > Ocean waves fields
 
