@@ -108,12 +108,16 @@ class Client:
         beta=True,
         preserve_request_order=False,
         infer_stream_keyword=True,
+        debug=False,
     ):
         self._url = None
         self.source = source
         self.beta = beta
         self.preserve_request_order = preserve_request_order
         self.infer_stream_keyword = infer_stream_keyword
+
+        if debug:
+            logging.basicConfig(level=logging.DEBUG)
 
     @property
     def url(self):
