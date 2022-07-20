@@ -19,7 +19,7 @@ client.retrieve(
 )
 ```
 
-> ❗ **NOTE:** This package is designed for users that want to download a subset of the whole dataset. If you plan to download a large percentage of each data file, it may be more efficient to download whole files and filter out the data you want locally. See the documentation on the [file naming convention](https://confluence.ecmwf.int/display/UDOC/ECMWF+Open+Data+-+Real+Time) for more information. Alternatively, you can use this tool to download whole files by only specifying `date`, `time`, `step`, `stream` and `type`. Please be aware that all data for a full day is in the order of 726 GiB.
+> ❗ **NOTE:** This package is designed for users that want to download a subset of the whole dataset. If you plan to download a large percentage of each data file, it may be more efficient to download whole files and filter out the data you want locally. See the documentation on the [file naming convention](https://confluence.ecmwf.int/display/DAC/ECMWF+open+data:+real-time+forecasts) for more information. Alternatively, you can use this tool to download whole files by only specifying `date`, `time`, `step`, `stream` and `type`. Please be aware that all data for a full day is in the order of 726 GiB.
 
 
 ## Options
