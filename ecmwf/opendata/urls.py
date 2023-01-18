@@ -16,6 +16,7 @@ DOT_ECMWF_OPENDATA = os.path.expanduser("~/.ecmwf-opendata")
 URLS = {
     "ecmwf": "https://data.ecmwf.int/forecasts",
     "azure": "https://ai4edataeuwest.blob.core.windows.net/ecmwf",
+    "aws": "https://ecmwf-forecasts.s3.eu-central-1.amazonaws.com",
 }
 
 if os.path.exists(DOT_ECMWF_OPENDATA):
