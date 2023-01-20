@@ -41,7 +41,7 @@ setuptools.setup(
     url="https://github.com/ecmwf/ecmwf-opendata",
     packages=setuptools.find_namespace_packages(include=["ecmwf.*"]),
     include_package_data=True,
-    install_requires=["multiurl>=0.0.14"],
+    install_requires=["multiurl>=0.2.0"],
     zip_safe=True,
     keywords="tool",
     classifiers=[
