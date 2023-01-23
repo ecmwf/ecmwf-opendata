@@ -176,7 +176,7 @@ class Client:
                 return date
             date -= delta
 
-        raise ValueError("Cannot etablish latest date for %r" % (result.for_urls,))
+        raise ValueError("Cannot establish latest date for %r" % (result.for_urls,))
 
     def _get_urls(self, request=None, use_index=None, target=None, **kwargs):
 
