@@ -8,7 +8,6 @@ def patch_stream(stream, time, type):
 
 
 def test_stream():
-
     assert patch_stream("oper", 0, "fc") == "oper"
     assert patch_stream("oper", 6, "fc") == "scda"
     assert patch_stream("oper", 12, "fc") == "oper"

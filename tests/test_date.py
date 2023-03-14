@@ -7,7 +7,6 @@ from ecmwf.opendata.date import canonical_time, end_step, full_date
 
 @freeze_time("2022-01-21T13:21:34Z")
 def test_date_1():
-
     assert full_date("20010101") == datetime.datetime(2001, 1, 1)
     assert full_date(20010101) == datetime.datetime(2001, 1, 1)
     assert full_date("2001-01-01") == datetime.datetime(2001, 1, 1)

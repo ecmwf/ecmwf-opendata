@@ -8,7 +8,6 @@ README = os.path.realpath(
 
 
 def example_list():
-
     examples = []
     code = []
     python = False

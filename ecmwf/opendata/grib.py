@@ -25,7 +25,6 @@ from eccodes import (
 
 
 def grib_index(path):
-
     index = []
     with open(path, "rb") as f:
         while True:

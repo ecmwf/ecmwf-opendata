@@ -45,7 +45,6 @@ seen = set()
 
 with open("index.txt") as f:
     for j, url in enumerate(f):
-
         url = url.rstrip()
 
         if (
@@ -67,7 +66,6 @@ with open("index.txt") as f:
             lines.append(line)
 
         for i, line in enumerate(lines):
-
             key = tuple(line.get(x) for x in ("type", "stream", "levtype", "param"))
             if key in seen:
                 continue

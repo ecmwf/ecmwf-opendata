@@ -31,7 +31,6 @@ def canonical_time(time):
 
 
 def full_date(date, time=None):
-
     if isinstance(date, datetime.date) and not isinstance(date, datetime.datetime):
         date = datetime.datetime(date.year, date.month, date.day)
 
@@ -43,7 +42,6 @@ def full_date(date, time=None):
             date = datetime.datetime(date // 10000, date % 10000 // 100, date % 100)
 
     if isinstance(date, str):
-
         try:
             return full_date(int(date), time)
         except ValueError:

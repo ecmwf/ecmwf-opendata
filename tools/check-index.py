@@ -87,7 +87,6 @@ with open("index.txt") as f:
                     ("stream", rstream, stream),
                     ("type", rtype, type),
                 ):
-
                     if b != c:
                         print("Mismatch: %r %r %r" % (a, b, c))
                         # assert False

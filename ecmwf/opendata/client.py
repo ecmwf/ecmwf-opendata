@@ -47,7 +47,6 @@ ONCE = set()
 
 
 def warning_once(*args, did_you_mean=None):
-
     if repr(args) in ONCE:
         return
 
@@ -109,21 +108,22 @@ class Client:
         preserve_request_order=False,
         infer_stream_keyword=True,
         debug=False,
+        verify=True,
     ):
         self._url = None
         self.source = source
         self.beta = beta
         self.preserve_request_order = preserve_request_order
         self.infer_stream_keyword = infer_stream_keyword
+        self.session = requests.Session()
+        self.verify = verify
 
         if debug:
             logging.basicConfig(level=logging.DEBUG)
 
     @property
     def url(self):
-
         if self._url is None:
-
             if self.source.startswith("http://") or self.source.startswith("https://"):
                 self._url = self.source
             else:
@@ -141,12 +141,22 @@ class Client:
 
     def retrieve(self, request=None, target=None, **kwargs):
         result = self._get_urls(request, target=target, use_index=True, **kwargs)
-        result.size = download(result.urls, target=result.target)
+        result.size = download(
+            result.urls,
+            target=result.target,
+            verify=self.verify,
+            session=self.session,
+        )
         return result
 
     def download(self, request=None, target=None, **kwargs):
         result = self._get_urls(request, target=target, use_index=False, **kwargs)
-        result.size = download(result.urls, target=result.target)
+        result.size = download(
+            result.urls,
+            target=result.target,
+            verify=self.verify,
+            session=self.session,
+        )
         return result
 
     def latest(self, request=None, **kwargs):
@@ -171,7 +181,10 @@ class Client:
                 date=date,
                 **params,
             )
-            codes = [robust(requests.head)(url).status_code for url in result.urls]
+            codes = [
+                robust(self.session.head)(url, verify=self.verify).status_code
+                for url in result.urls
+            ]
             if len(codes) > 0 and all(c == 200 for c in codes):
                 return date
             date -= delta
@@ -179,7 +192,6 @@ class Client:
         raise ValueError("Cannot establish latest date for %r" % (result.for_urls,))
 
     def _get_urls(self, request=None, use_index=None, target=None, **kwargs):
-
         assert use_index in (True, False)
         if request is None:
             params = dict(**kwargs)
@@ -230,7 +242,6 @@ class Client:
         )
 
     def get_parts(self, data_urls, for_index):
-
         count = len(for_index)
         result = []
         line = None
@@ -240,7 +251,7 @@ class Client:
         for url in data_urls:
             base, _ = os.path.splitext(url)
             index_url = f"{base}.index"
-            r = robust(requests.get)(index_url)
+            r = robust(self.session.get)(index_url, verify=self.verify)
             r.raise_for_status()
 
             parts = []
