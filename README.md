@@ -444,11 +444,11 @@ Below is the list of all parameters:
 
 > Ensemble mean and standard deviation - pressure levels
 
-| Parameter | Description | Units |
-| --------- | ----------- | ----- |
-| gh | Geopotential height | gpm |
-| t | Temperature | K |
-| ws | Wind speed | m s<sup>-1</sup> |
+| Parameter | Description | Units | Levels |
+| --------- | ----------- | ----- | ------ |
+| gh | Geopotential height | gpm | 300, 500, 1000 |
+| t | Temperature | K | 250, 500, 850 |
+| ws | Wind speed | m s<sup>-1</sup> | 250, 850 |
 
 > Ensemble mean and standard deviation - single level
 
