@@ -31,13 +31,13 @@ from .urls import URLS
 LOG = logging.getLogger(__name__)
 
 HOURLY_PATTERN = (
-    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{_stream}/"
-    "{_yyyymmddHHMMSS}-{step}h-{_stream}-{type}.{_extension}"
+    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{_stream}-opendata/"
+    "{_yyyymmddHHMMSS}-{step}h-{_stream}-opendata-{type}.{_extension}"
 )
 
 MONTHLY_PATTERN = (
-    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{_stream}/"
-    "{_yyyymmddHHMMSS}-{fcmonth}m-{_stream}-{type}.{_extension}"
+    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{_stream}-opendata/"
+    "{_yyyymmddHHMMSS}-{fcmonth}m-{_stream}-opendata-{type}.{_extension}"
 )
 
 PATTERNS = {"mmsa": MONTHLY_PATTERN}
