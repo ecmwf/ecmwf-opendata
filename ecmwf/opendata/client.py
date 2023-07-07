@@ -172,7 +172,7 @@ class Client:
 
         date = full_date(0, params.get("time", 18))
 
-        stop = date - datetime.timedelta(days=1, hours=6)
+        stop = date - datetime.timedelta(days=2, hours=0)
 
         while date > stop:
             result = self._get_urls(
