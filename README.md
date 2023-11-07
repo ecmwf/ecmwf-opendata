@@ -4,11 +4,11 @@
 
 A collection of Jupyter Notebooks that make use of that package is available [here](https://github.com/ecmwf/notebook-examples/tree/master/opencharts).
 
-## Instalation
+## Installation
 
 The `ecmwf-opendata` Python package can be installed from PyPI with:  
 
-```$ pip install cfgrib```
+```$ pip install ecmwf-opendata```
 
 ## Usage
 The example below will download the latest available 10-day forecast for the *mean sea level pressure* (`msl`) into a local file called `data.grib2`:
