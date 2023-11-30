@@ -356,14 +356,18 @@ ENS:
 
 ### Time steps
 
-To select a time step, use the `step` keyword:
+The time step is how far in the future the forecast is for. It is expressed in hours. For instance, requesting a forecast with a step value of 24 will return the estimate for 1 day after the forecast's creation. The future date is returns in the `valid_time` column of the downloaded data.
+
+To configure the time step, use the `step` keyword:
 
 ```python
-...
    step=24,
-...
+```
+
+You are not limited to a single time step. To request multiple time steps, use a list:
+
+```python
    step=[24, 48],
-...
 ```
 
 | Forecasting system | Time | List of time steps |
