@@ -6,7 +6,7 @@ A collection of Jupyter Notebooks that make use of that package is available [he
 
 ## Installation
 
-The `ecmwf-opendata` Python package can be installed from PyPI with:  
+The `ecmwf-opendata` Python package can be installed from PyPI with:
 
 ```$ pip install ecmwf-opendata```
 
@@ -36,7 +36,8 @@ The constructor of the client object takes the following options:
 ```python
 client = Client(
     source="ecmwf",
-    beta=True,
+    model="ifs",
+    resol="0p25",
     preserve_request_order=False,
     infer_stream_keyword=True,
 )
@@ -46,14 +47,16 @@ where:
 
 - `source` is either the name of server to contact or a fully qualified URL. Possible values are `ecmwf` to access ECMWF's servers, or `azure` to access data hosted on Microsoft's Azure. Default is `ecmwf`.
 
-- `beta` is a boolean that indicates whether to access the beta or the production version of the dataset. Current only `beta=True` is supported.
+- `model` is the name of the model that produced the data. Use `ifs` for the physics-driven model and `aifs` for the data-driven model. Please note that `aifs` is currently experimental and only produces a small subset of fields. Default is `ifs`.
+
+- `resol` specifies the resolution of the data. Default is `0p25` for 0.25 degree resolution, and is the only resolution that is currently available.
 
 - `preserve_request_order`. If this flag is set to `True`, the library will attempt to write the retrieved data into the target file in the order specified by the request. For example, if the request specifies `param=[2t,msl]` the library will ensure that the field `2t` is first in the target file, while with `param=[msl,2t]`, the field `msl` will be first. This also works across different keywords: `...,levelist=[500,100],param=[z,t],...` will produce different output to `...,param=[z,t],levelist=[500,100],...`
 If the flag is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. Default is `False`.
 
-- `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge of how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the correct value for the `stream` keyword based on the rest of the request. Default is `True`.
+- `infer_stream_keyword`. The `stream` keyword represents the ECMWF forecasting system that creates the data. Setting it properly requires knowledge of how ECMWF runs its operations. If this boolean is set to `True`, the library will try to infer the correct value for the `stream` keyword based on the rest of the request. Default is `True` if model is `ifs`.
 
- > ⚠️ **NOTE:** It is  recommended **not** to set the `preserve_request_order` flag to `True` when downloading a large number of fields as this will add extra load on the servers.
+ > ⚠️ **NOTE:** It is recommended **not** to set the `preserve_request_order` flag to `True` when downloading a large number of fields as this will add extra load on the servers.
 
 ## Methods
 

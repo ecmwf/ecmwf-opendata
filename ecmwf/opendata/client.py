@@ -31,12 +31,12 @@ from .urls import URLS
 LOG = logging.getLogger(__name__)
 
 HOURLY_PATTERN = (
-    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{_stream}/"
+    "{_url}/{_yyyymmdd}/{_H}z/{model}/{resol}/{_stream}/"
     "{_yyyymmddHHMMSS}-{step}h-{_stream}-{type}.{_extension}"
 )
 
 MONTHLY_PATTERN = (
-    "{_url}/{_yyyymmdd}/{_H}z/{resol}/{_stream}/"
+    "{_url}/{_yyyymmdd}/{_H}z/{model}/{resol}/{_stream}/"
     "{_yyyymmddHHMMSS}-{fcmonth}m-{_stream}-{type}.{_extension}"
 )
 
@@ -104,7 +104,9 @@ class Client:
     def __init__(
         self,
         source="ecmwf",
-        beta=True,
+        model="ifs",
+        resol="0p25",
+        beta=None,  # Unused, we keep it for compatibility
         preserve_request_order=False,
         infer_stream_keyword=True,
         debug=False,
@@ -112,7 +114,8 @@ class Client:
     ):
         self._url = None
         self.source = source
-        self.beta = beta
+        self.model = model
+        self.resol = resol
         self.preserve_request_order = preserve_request_order
         self.infer_stream_keyword = infer_stream_keyword
         self.session = requests.Session()
@@ -317,8 +320,18 @@ class Client:
         return FOR_URL.get((key, value), value)
 
     def prepare_request(self, request=None, **kwargs):
+        if request is None:
+            params = dict(**kwargs)
+        else:
+            params = dict(**request)
+
+        model = self.model
+        if "class" in request:
+            model = {"od": "ifs", "ai": "aifs"}[request["class"]]
+
         DEFAULTS_FC = dict(
-            resol="0p4-beta" if self.beta else "0p4",
+            model=model,
+            resol=self.resol,
             type="fc",
             stream="oper",
             step=0,
@@ -326,7 +339,8 @@ class Client:
         )
 
         DEFAULTS_EF = dict(
-            resol="0p4-beta" if self.beta else "0p4",
+            model=model,
+            resol=self.resol,
             type=["cf", "pf"],
             stream="enfo",
             step=0,
@@ -341,6 +355,7 @@ class Client:
         URL_COMPONENTS = (
             "date",
             "time",
+            "model",
             "resol",
             "stream",
             "type",  # Must be before 'step' in that list
@@ -388,16 +403,12 @@ class Client:
             "stream": ["oper", "wave", "scda", "scwv", "enfo", "waef", "mmsa"],
         }
 
-        if request is None:
-            params = dict(**kwargs)
-        else:
-            params = dict(**request)
-
         defaults = DEFAULTS.get(params.get("stream"), DEFAULTS_FC)
         for key, value in defaults.items():
             params.setdefault(key, value)
 
         params.pop("target", None)
+        params.pop("class", None)
 
         params.pop(OTHER_STEP.get(params["stream"], "fcmonth"), None)
 
@@ -496,7 +507,7 @@ class Client:
         }
         stream, time, type = args["stream"], args["_H"], args["type"]
 
-        if not self.infer_stream_keyword:
+        if not self.infer_stream_keyword or args["model"] == "aifs":
             return stream
 
         stream = URL_STREAM_MAPPING.get((stream, time), stream)
