@@ -326,8 +326,8 @@ class Client:
             params = dict(**request)
 
         model = self.model
-        if "class" in request:
-            model = {"od": "ifs", "ai": "aifs"}[request["class"]]
+        if "class" in params:
+            model = {"od": "ifs", "ai": "aifs"}[params["class"]]
 
         DEFAULTS_FC = dict(
             model=model,

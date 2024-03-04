@@ -1,4 +1,5 @@
 import os
+import sys
 
 import pytest
 
@@ -35,9 +36,15 @@ def test_example(example):
     try:
         exec(code, dict(__file__=README), {})
     except Exception as e:
+        print('===========', file=sys.stderr)
+        print(code, file=sys.stderr)
+        print('===========', file=sys.stderr)
         raise ValueError("Exception: %s\n%s" % (e, code))
 
 
 if __name__ == "__main__":
     for e in example_list():
-        test_example(e)
+        try:
+            test_example(e)
+        except Exception:
+            pass

@@ -3,7 +3,7 @@ from ecmwf.opendata import Client
 
 def patch_stream(stream, time, type):
     client = Client(infer_stream_keyword=True)
-    args = {"stream": stream, "_H": "%02d" % (time,), "type": type}
+    args = {"stream": stream, "_H": "%02d" % (time,), "type": type, "model": "ifs"}
     return client.patch_stream(args)
 
 
