@@ -36,9 +36,9 @@ def test_example(example):
     try:
         exec(code, dict(__file__=README), {})
     except Exception as e:
-        print('===========', file=sys.stderr)
+        print("===========", file=sys.stderr)
         print(code, file=sys.stderr)
-        print('===========', file=sys.stderr)
+        print("===========", file=sys.stderr)
         raise ValueError("Exception: %s\n%s" % (e, code))
 
 
