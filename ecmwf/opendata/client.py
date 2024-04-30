@@ -229,6 +229,10 @@ class Client:
             args["_stream"] = self.patch_stream(args)
 
             url = pattern.format(**args)
+
+            if self.resol == "0p4-beta":
+                url = url.replace("/ifs/", "/")
+
             if url not in seen:
                 data_urls.append(url)
                 seen.add(url)
@@ -281,6 +285,7 @@ class Client:
 
         for name, values in for_index.items():
             diff = set(values).difference(possible_values[name])
+            print(diff, sorted(possible_values[name]))
             for d in diff:
                 warning_once(
                     "No index entries for %s=%s",
