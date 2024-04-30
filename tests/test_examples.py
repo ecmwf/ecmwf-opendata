@@ -45,6 +45,6 @@ def xxx_test_example(example):
 if __name__ == "__main__":
     for e in example_list():
         try:
-            test_example(e)
+            xxx_test_example(e)
         except Exception:
             pass
