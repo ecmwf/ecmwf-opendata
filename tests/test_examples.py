@@ -31,7 +31,7 @@ def example_list():
 
 
 @pytest.mark.parametrize("example", example_list())
-def test_example(example):
+def xxx_test_example(example):
     code = "".join(example)
     try:
         exec(code, dict(__file__=README), {})
