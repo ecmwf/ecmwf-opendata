@@ -285,7 +285,6 @@ class Client:
 
         for name, values in for_index.items():
             diff = set(values).difference(possible_values[name])
-            print(diff, sorted(possible_values[name]))
             for d in diff:
                 warning_once(
                     "No index entries for %s=%s",
