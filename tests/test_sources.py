@@ -1,5 +1,6 @@
-import pytest
 import os
+
+import pytest
 
 from ecmwf.opendata import Client
 from ecmwf.opendata.bufr import count_bufrs
