@@ -106,7 +106,7 @@ class Client:
         source="ecmwf",
         model="ifs",
         resol="0p25",
-        beta=None,  # Unused, we keep it for compatibility
+        beta=False,  # to access experimental data
         preserve_request_order=False,
         infer_stream_keyword=True,
         debug=False,
@@ -116,6 +116,7 @@ class Client:
         self.source = source
         self.model = model
         self.resol = resol
+        self.beta = beta
         self.preserve_request_order = preserve_request_order
         self.infer_stream_keyword = infer_stream_keyword
         self.session = requests.Session()
@@ -228,6 +229,11 @@ class Client:
             args["_extension"] = EXTENSIONS.get(args["type"], "grib2")
             args["_stream"] = self.patch_stream(args)
 
+            if self.beta:
+                # test data is put in an /experimental subdir after resol
+                # it is not part of a mars request, so we inject it here
+                args["resol"] += "/experimental"
+
             url = pattern.format(**args)
 
             if self.resol == "0p4-beta":
@@ -331,7 +337,7 @@ class Client:
 
         model = self.model
         if "class" in params:
-            model = {"od": "ifs", "ai": "aifs"}[params["class"]]
+            model = {"od": "ifs", "ai": "aifs-single"}[params["class"]]
 
         DEFAULTS_FC = dict(
             model=model,
