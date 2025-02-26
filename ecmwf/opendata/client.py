@@ -517,7 +517,7 @@ class Client:
         }
         stream, time, type = args["stream"], args["_H"], args["type"]
 
-        if not self.infer_stream_keyword or args["model"] == "aifs":
+        if not self.infer_stream_keyword or args["model"] == "aifs-single":
             return stream
 
         stream = URL_STREAM_MAPPING.get((stream, time), stream)
