@@ -47,7 +47,7 @@ where:
 
 - `source` is either the name of server to contact or a fully qualified URL. Possible values are `ecmwf` to access ECMWF's servers, or `azure` to access data hosted on Microsoft's Azure. Default is `ecmwf`.
 
-- `model` is the name of the model that produced the data. Use `ifs` for the physics-driven model and `aifs` for the data-driven model. Please note that `aifs` is currently experimental and only produces a small subset of fields. Default is `ifs`.
+- `model` is the name of the model that produced the data. Use `ifs` for the physics-driven model and `aifs-single` for the data-driven model. Default is `ifs`.
 
 - `resol` specifies the resolution of the data. Default is `0p25` for 0.25 degree resolution, and is the only resolution that is currently available.
 
