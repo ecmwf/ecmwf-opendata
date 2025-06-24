@@ -342,7 +342,9 @@ class Client:
 
         model = self.model
         if "class" in params:
-            model = {"od": "ifs", "ai": "aifs-single", "aifs-ens" : "aifs-ens"}[params["class"]]
+            model = {"od": "ifs", "ai": "aifs-single", "aifs-ens": "aifs-ens"}[
+                params["class"]
+            ]
 
         # Default stream for aifs-ens is enfo as this model only has ensemble forecasts
         if self.model == "aifs-ens":
