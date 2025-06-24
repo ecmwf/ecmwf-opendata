@@ -321,6 +321,11 @@ class Client:
             ("stream", "mmsa"): "mmsf",
         }
 
+        # If the model is aifs-ens, we need to map the type to pf/cf because aifs-ens does not currently use ef
+        if self.model == "aifs-ens":
+            FOR_URL[("type", "pf")] = "pf"
+            FOR_URL[("type", "cf")] = "cf"
+
         if key == "step" and for_urls["type"] == ["ep"]:
             if end_step(value) <= 240:
                 return "240"
@@ -337,7 +342,11 @@ class Client:
 
         model = self.model
         if "class" in params:
-            model = {"od": "ifs", "ai": "aifs-single"}[params["class"]]
+            model = {"od": "ifs", "ai": "aifs-single", "aifs-ens" : "aifs-ens"}[params["class"]]
+
+        # Default stream for aifs-ens is enfo as this model only has ensemble forecasts
+        if self.model == "aifs-ens":
+            params["stream"] = "enfo"
 
         DEFAULTS_FC = dict(
             model=model,
