@@ -591,6 +591,29 @@ client.retrieve(
 - All of the odd numbered ensemble members use `number=[num for num in range(1,51,2)]`.
 - To download the control member, use `type="cf"`.
 
+
+### Download a single surface parameter at a single forecast step for all ensemble members from ECMWF's 12UTC 00UTC AIFS-ENS forecast
+
+> 📌 **NOTE**: This data is currently only available test data and is not available from the `ecmwf` source, a different url is required.
+
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf", model="aifs-ens")
+
+client.retrieve(
+    time=0,
+    stream="enfo",
+    type="pf",
+    param="msl",
+    target="data.grib2",
+)
+```
+
+- To download a single ensemble member, use the `number` keyword:  `number=1`.
+- All of the odd numbered ensemble members use `number=[num for num in range(1,51,2)]`.
+- To download the control member, use `type="cf"`.
+
 ### Download the Tropical Cyclone tracks from ECMWF's 00UTC ENS forecast
 
 The Tropical Cyclone tracks are identified by the keyword `type="tf"`.
