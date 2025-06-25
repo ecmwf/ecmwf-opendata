@@ -10,6 +10,6 @@
 
 from .client import Client
 
-__version__ = "0.3.19"
+__version__ = "0.3.20"
 
 __all__ = ["Client"]

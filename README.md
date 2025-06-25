@@ -26,7 +26,7 @@ client.retrieve(
 )
 ```
 
-> ❗ **NOTE:** This package is designed for users that want to download a subset of the whole dataset. If you plan to download a large percentage of each data file, it may be more efficient to download whole files and filter out the data you want locally. See the documentation on the [file naming convention](https://confluence.ecmwf.int/display/DAC/ECMWF+open+data:+real-time+forecasts) for more information. Alternatively, you can use this tool to download whole files by only specifying `date`, `time`, `step`, `stream` and `type`. Please be aware that all data for a full day is in the order of 726 GiB.
+> ❗ **NOTE:** This package is designed for users that want to download a subset of the whole dataset. If you plan to download a large percentage of each data file, it may be more efficient to download whole files and filter out the data you want locally. See the documentation on the [file naming convention](https://confluence.ecmwf.int/display/DAC/ECMWF+open+data%3A+real-time+forecasts+from+IFS+and+AIFS) for more information. Alternatively, you can use this tool to download whole files by only specifying `date`, `time`, `step`, `stream` and `type`. Please be aware that all data for a full day is in the order of 726 GiB.
 
 
 ## Options
@@ -47,7 +47,7 @@ where:
 
 - `source` is either the name of server to contact or a fully qualified URL. Possible values are `ecmwf` to access ECMWF's servers, or `azure` to access data hosted on Microsoft's Azure. Default is `ecmwf`.
 
-- `model` is the name of the model that produced the data. Use `ifs` for the physics-driven model and `aifs-single` for the data-driven model. Default is `ifs`.
+- `model` is the name of the model that produced the data. Use `ifs` for the physics-driven model, `aifs-single` for the data-driven model, and `aifs-ens` for the ensemble data-driven model. Default is `ifs`.
 
 - `resol` specifies the resolution of the data. Default is `0p25` for 0.25 degree resolution, and is the only resolution that is currently available.
 
@@ -577,6 +577,29 @@ client.retrieve(
 from ecmwf.opendata import Client
 
 client = Client(source="ecmwf")
+
+client.retrieve(
+    time=0,
+    stream="enfo",
+    type="pf",
+    param="msl",
+    target="data.grib2",
+)
+```
+
+- To download a single ensemble member, use the `number` keyword:  `number=1`.
+- All of the odd numbered ensemble members use `number=[num for num in range(1,51,2)]`.
+- To download the control member, use `type="cf"`.
+
+
+### Download a single surface parameter at a single forecast step for all ensemble members from ECMWF's 12UTC 00UTC AIFS-ENS forecast
+
+> 📌 **NOTE**: This data is currently only available test data and is not available from the `ecmwf` source, a different url is required.
+
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf", model="aifs-ens")
 
 client.retrieve(
     time=0,
