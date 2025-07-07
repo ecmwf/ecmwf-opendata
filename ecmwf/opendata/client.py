@@ -339,7 +339,7 @@ class Client:
             params = dict(**kwargs)
         else:
             params = dict(**request)
-        
+
         # If model is in the retireve overwrite the client model
         # Warn user if client model does not match the model in retrieve
         if "model" in params:
