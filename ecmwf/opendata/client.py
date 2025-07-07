@@ -339,6 +339,19 @@ class Client:
             params = dict(**kwargs)
         else:
             params = dict(**request)
+        
+        # If model is in the retireve overwrite the client model
+        # Warn user if client model does not match the model in retrieve
+        if "model" in params:
+            if self.model != params["model"]:
+                warning_once(
+                    "Model %r does not match the client model %r, using model %r from retrieve",
+                    params["model"],
+                    self.model,
+                    params["model"],
+                    did_you_mean=(params["model"], self.model),
+                )
+            self.model = params["model"]
 
         model = self.model
         if "class" in params:
