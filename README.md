@@ -594,8 +594,6 @@ client.retrieve(
 
 ### Download a single surface parameter at a single forecast step for all ensemble members from ECMWF's 12UTC 00UTC AIFS-ENS forecast
 
-> 📌 **NOTE**: This data is currently only available test data and is not available from the `ecmwf` source, a different url is required.
-
 ```python
 from ecmwf.opendata import Client
 

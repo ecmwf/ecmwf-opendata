@@ -311,7 +311,7 @@ class Client:
 
         return FOR_INDEX.get((key, value), value)
 
-    def user_to_url(self, key, value, request, for_urls):
+    def user_to_url(self, key, value, request, for_urls, model):
         FOR_URL = {
             ("type", "cf"): "ef",
             ("type", "pf"): "ef",
@@ -322,7 +322,7 @@ class Client:
         }
 
         # If the model is aifs-ens, we need to map the type to pf/cf because aifs-ens does not currently use ef
-        if self.model == "aifs-ens":
+        if model == "aifs-ens":
             FOR_URL[("type", "pf")] = "pf"
             FOR_URL[("type", "cf")] = "cf"
 
@@ -340,14 +340,28 @@ class Client:
         else:
             params = dict(**request)
 
-        model = self.model
+        # If model is in the retireve overwrite the client model
+        # Warn user if client model does not match the model in retrieve
+        if "model" in params:
+            if self.model != params["model"]:
+                warning_once(
+                    "Model %r does not match the client model %r, using model %r from retrieve",
+                    params["model"],
+                    self.model,
+                    params["model"],
+                    did_you_mean=(params["model"], self.model),
+                )
+            model = params["model"]
+        else:
+            model = self.model
+
         if "class" in params:
             model = {"od": "ifs", "ai": "aifs-single", "aifs-ens": "aifs-ens"}[
                 params["class"]
             ]
 
         # Default stream for aifs-ens is enfo as this model only has ensemble forecasts
-        if self.model == "aifs-ens":
+        if model == "aifs-ens":
             params["stream"] = "enfo"
 
         DEFAULTS_FC = dict(
@@ -484,7 +498,9 @@ class Client:
                             for_index[k].append(value)
 
             if k in URL_COMPONENTS:
-                for values in [self.user_to_url(k, x, params, for_urls) for x in v]:
+                for values in [
+                    self.user_to_url(k, x, params, for_urls, model) for x in v
+                ]:
                     if not isinstance(values, (list, tuple)):
                         values = [values]
                     for value in values:
