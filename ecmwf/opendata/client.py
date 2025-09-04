@@ -45,6 +45,19 @@ EXTENSIONS = {"tf": "bufr"}
 
 ONCE = set()
 
+_ATTRIBUTION_SHOWN = False  # module-level guard to avoid spamming
+
+
+def _show_attribution_message():
+    global _ATTRIBUTION_SHOWN
+    if not _ATTRIBUTION_SHOWN:
+        print(
+            "By downloading data from the ECMWF open data dataset, you agree to "
+            "the terms: Attribution 4.0 International (CC BY 4.0). Please "
+            "attribute ECMWF when downloading this data."
+        )
+        _ATTRIBUTION_SHOWN = True
+
 
 def warning_once(*args, did_you_mean=None):
     if repr(args) in ONCE:
@@ -151,6 +164,7 @@ class Client:
             verify=self.verify,
             session=self.session,
         )
+        _show_attribution_message()
         return result
 
     def download(self, request=None, target=None, **kwargs):
@@ -161,6 +175,7 @@ class Client:
             verify=self.verify,
             session=self.session,
         )
+        _show_attribution_message()
         return result
 
     def latest(self, request=None, **kwargs):
