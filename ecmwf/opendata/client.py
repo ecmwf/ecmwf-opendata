@@ -124,6 +124,9 @@ class Client:
         infer_stream_keyword=True,
         debug=False,
         verify=True,
+        use_sas_token=None,
+        sas_known_key="ecmwf",
+        sas_custom_url=None,
     ):
         self._url = None
         self.source = source
@@ -135,8 +138,26 @@ class Client:
         self.session = requests.Session()
         self.verify = verify
 
+        # If the data source is azure, enable SAS token generation
+        if use_sas_token is None:
+            self.use_sas_token = source == "azure"
+        else:
+            self.use_sas_token = use_sas_token
+
+        self.sas_token = None
+
         if debug:
             logging.basicConfig(level=logging.DEBUG)
+
+        if self.use_sas_token:
+            self.sas_token = self._get_azure_sas_token(
+                known_key=sas_known_key,
+                custom_url=sas_custom_url,
+            )
+            self.original_get = self.session.get
+            self.original_head = self.session.head
+            self.session.get = self._get_with_sas
+            self.session.head = self._head_with_sas
 
     @property
     def url(self):
@@ -158,6 +179,10 @@ class Client:
 
     def retrieve(self, request=None, target=None, **kwargs):
         result = self._get_urls(request, target=target, use_index=True, **kwargs)
+
+        if self.use_sas_token:
+            result.urls = self._apply_sas_to_urls(result.urls)
+
         result.size = download(
             result.urls,
             target=result.target,
@@ -169,6 +194,10 @@ class Client:
 
     def download(self, request=None, target=None, **kwargs):
         result = self._get_urls(request, target=target, use_index=False, **kwargs)
+
+        if self.use_sas_token:
+            result.urls = self._apply_sas_to_urls(result.urls)
+
         result.size = download(
             result.urls,
             target=result.target,
@@ -566,3 +595,39 @@ class Client:
         stream = URL_STREAM_MAPPING.get((stream, type), stream)
 
         return stream
+
+    def _get_azure_sas_token(self, known_key="ecmwf", custom_url=None):
+        known_urls = {
+            "ecmwf": "https://planetarycomputer.microsoft.com/api/sas/v1/token/ai4edataeuwest/ecmwf"
+        }
+        if known_key in known_urls:
+            url = known_urls[known_key]
+        elif custom_url:
+            url = custom_url
+        else:
+            raise ValueError("No known URL or custom URL provided")
+
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()["token"]
+
+    def _add_sas_to_url(self, url):
+        if "sig=" in url:
+            return url
+        return f"{url}&{self.sas_token}" if "?" in url else f"{url}?{self.sas_token}"
+
+    def _get_with_sas(self, url, **kwargs):
+        return self.original_get(self._add_sas_to_url(url), **kwargs)
+
+    def _head_with_sas(self, url, **kwargs):
+        return self.original_head(self._add_sas_to_url(url), **kwargs)
+
+    def _apply_sas_to_urls(self, urls):
+        updated_urls = []
+        for item in urls:
+            if isinstance(item, tuple):
+                url, byte_ranges = item
+                updated_urls.append((self._add_sas_to_url(url), byte_ranges))
+            else:
+                updated_urls.append(self._add_sas_to_url(item))
+        return updated_urls 
