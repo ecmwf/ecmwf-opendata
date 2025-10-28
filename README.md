@@ -47,6 +47,8 @@ where:
 
 - `source` is either the name of server to contact or a fully qualified URL. Possible values are `ecmwf` to access ECMWF's servers, `aws` for data hosted by Amazon Web Services or `azure` to access data hosted on Microsoft's Azure. Default is `ecmwf`.
 
+ > ⚠️ **NOTE:** The source `azure` generates an sas token for the user during retrieval. More information about the sas key can be found here [sas tokens](https://confluence.ecmwf.int/display/DAC/ECMWF+open+data%3A+real-time+forecasts+from+IFS+and+AIFS).
+
 - `model` is the name of the model that produced the data. Use `ifs` for the physics-driven model, `aifs-single` for the data-driven model, and `aifs-ens` for the ensemble data-driven model. Default is `ifs`.
 
 - `resol` specifies the resolution of the data. Default is `0p25` for 0.25 degree resolution, and is the only resolution that is currently available.
