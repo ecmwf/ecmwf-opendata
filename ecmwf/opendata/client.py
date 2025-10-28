@@ -630,4 +630,4 @@ class Client:
                 updated_urls.append((self._add_sas_to_url(url), byte_ranges))
             else:
                 updated_urls.append(self._add_sas_to_url(item))
-        return updated_urls 
+        return updated_urls
