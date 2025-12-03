@@ -6,7 +6,7 @@ from ecmwf.opendata import Client
 from ecmwf.opendata.bufr import count_bufrs
 from ecmwf.opendata.grib import count_gribs
 
-SOURCES = os.getenv("SOURCES_TO_TEST", "ecmwf,azure,aws").split(",")
+SOURCES = os.getenv("SOURCES_TO_TEST", "ecmwf,azure,aws,google").split(",")
 
 
 @pytest.mark.parametrize("source", SOURCES)
