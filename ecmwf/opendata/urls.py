@@ -18,6 +18,7 @@ URLS = {
     "azure": "https://ai4edataeuwest.blob.core.windows.net/ecmwf",
     "aws": "https://ecmwf-forecasts.s3.eu-central-1.amazonaws.com",
     "ecmwf-esuites": "https://xdiss.ecmwf.int/ecpds/home/opendata",
+    "google": "https://storage.googleapis.com/ecmwf-open-data",
 }
 
 if os.path.exists(DOT_ECMWF_OPENDATA):

@@ -45,7 +45,7 @@ client = Client(
 
 where:
 
-- `source` is either the name of server to contact or a fully qualified URL. Possible values are `ecmwf` to access ECMWF's servers, `aws` for data hosted by Amazon Web Services or `azure` to access data hosted on Microsoft's Azure. Default is `ecmwf`.
+- `source` is either the name of server to contact or a fully qualified URL. Possible values are `ecmwf` to access ECMWF's servers, `aws` for data hosted by Amazon Web Services, `google` for data hosted on Google Cloud Platform, or `azure` to access data hosted on Microsoft's Azure. Default is `ecmwf`.
 
  > ⚠️ **NOTE:** The source `azure` generates an sas token for the user during retrieval. More information about the sas key can be found here [sas tokens](https://confluence.ecmwf.int/display/DAC/ECMWF+open+data%3A+real-time+forecasts+from+IFS+and+AIFS).
 
