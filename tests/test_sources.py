@@ -41,8 +41,10 @@ def xxx_test_sources_2(source):
 
 @pytest.mark.parametrize("source", SOURCES)
 def test_sources_3(source):
-    if source=="google":
-        pytest.skip("Skipping test on google source due to known issue of multiple indexes not allowed on google")
+    if source == "google":
+        pytest.skip(
+            "Skipping test on google source due to known issue of multiple indexes not allowed on google"
+        )
     client = Client(source)
     client.retrieve(
         time=0,
@@ -72,8 +74,10 @@ def xxx_test_sources_4(source):
 @pytest.mark.parametrize("source", SOURCES)
 def test_sources_6(source):
     client = Client(source)
-    if source=="google":
-        pytest.skip("Skipping test on google source due to known issue of multiple indexes not allowed on google")
+    if source == "google":
+        pytest.skip(
+            "Skipping test on google source due to known issue of multiple indexes not allowed on google"
+        )
     client.retrieve(
         time=0,
         stream="enfo",
