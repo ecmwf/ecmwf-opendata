@@ -47,7 +47,7 @@ where:
 
 - `source` is either the name of server to contact or a fully qualified URL. Possible values are `ecmwf` to access ECMWF's servers, `aws` for data hosted by Amazon Web Services, `google` for data hosted on Google Cloud Platform, or `azure` to access data hosted on Microsoft's Azure. Default is `ecmwf`.
 
- > ⚠️ **Warning:** To ensure the stability of our systems and to preserve resources for our operational activities (network, compute, etc.), access to the open-data portal is limited to 500 simultaneous connections. This limit helps us guarantee reliable service for our operational users, especially during periods of high demand. For added reliability, the open-data is replicated across AWS, Azure, and Google Cloud. If you experience difficulties accessing the portal directly, you can also retrieve the data from these cloud platforms.
+ > ⚠️ **Warning:** `source=ecmwf` To ensure the stability of our systems and to preserve resources for our operational activities (network, compute, etc.), access to the open-data portal is limited to 500 simultaneous connections. This limit helps us guarantee reliable service for our operational users, especially during periods of high demand. For added reliability, the open-data is replicated across AWS, Azure, and Google Cloud. If you experience difficulties accessing the portal directly, you can also retrieve the data from these cloud platforms.
 
  > ⚠️ **NOTE:** The source `azure` generates an sas token for the user during retrieval. More information about the sas key can be found here [sas tokens](https://confluence.ecmwf.int/display/DAC/ECMWF+open+data%3A+real-time+forecasts+from+IFS+and+AIFS).
 
