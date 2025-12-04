@@ -4,7 +4,7 @@ from freezegun import freeze_time
 
 from ecmwf.opendata import Client
 
-TEST_URL = "https://get.ecmwf.int/repository/ecmwf-opendata/testing"
+TEST_URL = "https://sites.ecmwf.int/repository/ecmwf-opendata/testing"
 
 
 @freeze_time("2022-01-21t13:21:34Z")
