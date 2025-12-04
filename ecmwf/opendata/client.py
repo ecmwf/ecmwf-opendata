@@ -138,6 +138,16 @@ class Client:
         self.session = requests.Session()
         self.verify = verify
 
+        if source == "ecmwf":
+            warning_once("To ensure the stability of our systems and to " \
+                "preserve resources for our operational activities (network, compute, etc.), " \
+                "access to the open-data portal is limited to 500 simultaneous connections. " \
+                "This limit helps us guarantee reliable service for our operational users, " \
+                "especially during periods of high demand. " \
+                "For added reliability, the open-data is replicated across AWS, Azure, and Google Cloud." \
+                " If you experience difficulties accessing the portal directly, " \
+                "you can also retrieve the data from these cloud platforms.")
+
         # If the data source is azure, enable SAS token generation
         if use_sas_token is None:
             self.use_sas_token = source == "azure"
