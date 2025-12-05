@@ -45,6 +45,27 @@ EXTENSIONS = {"tf": "bufr"}
 
 ONCE = set()
 
+STEP_RANGE_PARAMS = [
+    "mn2t3",
+    "mx2t3",
+    "mn2t6",
+    "mx2t6",
+    "tpg1",
+    "tpg5",
+    "tpg10",
+    "tpg20",
+    "tpg25",
+    "tpg50",
+    "tpg100",
+    "10fgg10",
+    "10fgg15",
+    "10fgg25",
+    "swhg2",
+    "swhg4",
+    "swhg6",
+    "swhg8",
+]
+
 _ATTRIBUTION_SHOWN = False  # module-level guard to avoid spamming
 
 
@@ -100,7 +121,21 @@ def warning_once(*args, did_you_mean=None):
                     word,
                 )
 
-
+def parse_step_range_params(request):
+    for srp in STEP_RANGE_PARAMS:
+        if srp in (request or {}).get("param", "") and 0 in (request or {}).get(
+        "step", []
+    ):
+            warning_once(
+                f"Downloading step range parameter {srp}, no step=0 removing from request."
+            )
+            steps = request.get("step", [])
+            if isinstance(steps, int):
+                steps = [steps]
+            steps = [s for s in steps if s != 0]
+            if steps == []:
+                raise ValueError("No valid steps left in request after removing step=0")
+            request["step"] = steps
 class Result:
     def __init__(self, urls, target, dates, for_urls, for_index):
         self.urls = urls
@@ -190,6 +225,7 @@ class Client:
         return self._url
 
     def retrieve(self, request=None, target=None, **kwargs):
+        parse_step_range_params(request)
         result = self._get_urls(request, target=target, use_index=True, **kwargs)
 
         if self.use_sas_token:
@@ -205,6 +241,7 @@ class Client:
         return result
 
     def download(self, request=None, target=None, **kwargs):
+        parse_step_range_params(request)
         result = self._get_urls(request, target=target, use_index=False, **kwargs)
 
         if self.use_sas_token:
