@@ -121,11 +121,12 @@ def warning_once(*args, did_you_mean=None):
                     word,
                 )
 
+
 def parse_step_range_params(request):
     for srp in STEP_RANGE_PARAMS:
         if srp in (request or {}).get("param", "") and 0 in (request or {}).get(
-        "step", []
-    ):
+            "step", []
+        ):
             warning_once(
                 f"Downloading step range parameter {srp}, no step=0 removing from request."
             )
@@ -136,6 +137,8 @@ def parse_step_range_params(request):
             if steps == []:
                 raise ValueError("No valid steps left in request after removing step=0")
             request["step"] = steps
+
+
 class Result:
     def __init__(self, urls, target, dates, for_urls, for_index):
         self.urls = urls
