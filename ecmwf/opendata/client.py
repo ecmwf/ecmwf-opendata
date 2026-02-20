@@ -68,7 +68,7 @@ def warning_once(*args, did_you_mean=None):
     ONCE.add(repr(args))
 
     if did_you_mean:
-        (words, vocabulary) = did_you_mean
+        words, vocabulary = did_you_mean
 
         def levenshtein(a, b):
             if len(a) == 0:
