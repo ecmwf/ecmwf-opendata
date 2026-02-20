@@ -19,6 +19,7 @@ URLS = {
     "aws": "https://ecmwf-forecasts.s3.eu-central-1.amazonaws.com",
     "ecmwf-esuites": "https://xdiss.ecmwf.int/ecpds/home/opendata",
     "google": "https://storage.googleapis.com/ecmwf-open-data",
+    "ecmwf-testdata": "https://data.ecmwf.int/forecasts/testdata",
 }
 
 if os.path.exists(DOT_ECMWF_OPENDATA):
