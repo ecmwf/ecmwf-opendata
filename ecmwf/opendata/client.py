@@ -194,7 +194,6 @@ class Client:
 
         if self.use_sas_token:
             result.urls = self._apply_sas_to_urls(result.urls)
-
         result.size = download(
             result.urls,
             target=result.target,
@@ -583,21 +582,32 @@ class Client:
         return (dict(**for_urls), dict(**for_index))
 
     def patch_stream(self, args):
-        URL_STREAM_MAPPING = {
-            ("oper", "06"): "scda",
-            ("oper", "18"): "scda",
-            ("wave", "06"): "scwv",
-            ("wave", "18"): "scwv",
-            #
-            ("oper", "ef"): "enfo",
-            ("wave", "ef"): "waef",
-            ("oper", "ep"): "enfo",
-            ("wave", "ep"): "waef",
-            ("scda", "ef"): "enfo",
-            ("scwv", "ef"): "waef",
-            ("scda", "ep"): "enfo",
-            ("scwv", "ep"): "waef",
-        }
+        # As of IFS Cycle 50r1, the 06/18 UTC runs are archived under stream=oper/wave
+        # rather than stream=scda/scwv. This new behaviour is used when source="ecmwf-testdata"
+        # until the operational upgrade is complete.
+        if self.source == "ecmwf-testdata":
+            URL_STREAM_MAPPING = {
+                ("oper", "ef"): "enfo",
+                ("wave", "ef"): "waef",
+                ("oper", "ep"): "enfo",
+                ("wave", "ep"): "waef",
+            }
+        else:
+            URL_STREAM_MAPPING = {
+                ("oper", "06"): "scda",
+                ("oper", "18"): "scda",
+                ("wave", "06"): "scwv",
+                ("wave", "18"): "scwv",
+                #
+                ("oper", "ef"): "enfo",
+                ("wave", "ef"): "waef",
+                ("oper", "ep"): "enfo",
+                ("wave", "ep"): "waef",
+                ("scda", "ef"): "enfo",
+                ("scwv", "ef"): "waef",
+                ("scda", "ep"): "enfo",
+                ("scwv", "ep"): "waef",
+            }
         stream, time, type = args["stream"], args["_H"], args["type"]
 
         if not self.infer_stream_keyword or args["model"] == "aifs-single":
