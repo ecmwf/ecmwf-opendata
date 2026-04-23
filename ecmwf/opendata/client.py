@@ -298,6 +298,16 @@ class Client:
                 data_urls.append(url)
                 seen.add(url)
 
+        IFS_50R1_DATE = datetime.datetime(2025, 5, 12)
+        if any(d < IFS_50R1_DATE for d in dates):
+            warning_once(
+                "Some requested dates are before 2025-05-12. Data before this date uses a "
+                "different stream structure (06/18 UTC runs are under stream=scda/scwv) "
+                "compared to data on or after 2025-05-12 (where those runs are under "
+                "stream=oper/wave). This is handled automatically, but be aware that "
+                "the underlying file structure differs across this boundary."
+            )
+
         if for_index and use_index:
             data_urls = self.get_parts(data_urls, for_index)
 
