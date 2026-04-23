@@ -1,9 +1,15 @@
 from ecmwf.opendata import Client
 
 
-def patch_stream(stream, time, type, source="ecmwf"):
+def patch_stream(stream, time, type, source="ecmwf", date="20260101"):
     client = Client(source=source, infer_stream_keyword=True)
-    args = {"stream": stream, "_H": "%02d" % (time,), "type": type, "model": "ifs"}
+    args = {
+        "stream": stream,
+        "_H": "%02d" % (time,),
+        "type": type,
+        "model": "ifs",
+        "_yyyymmdd": date,
+    }
     return client.patch_stream(args)
 
 
