@@ -298,6 +298,16 @@ class Client:
                 data_urls.append(url)
                 seen.add(url)
 
+        IFS_50R1_DATE = datetime.datetime(2025, 5, 12)
+        if any(d < IFS_50R1_DATE for d in dates):
+            warning_once(
+                "Some requested dates are before 2025-05-12. Data before this date uses a "
+                "different stream structure (06/18 UTC runs are under stream=scda/scwv) "
+                "compared to data on or after 2025-05-12 (where those runs are under "
+                "stream=oper/wave). This is handled automatically, but be aware that "
+                "the underlying file structure differs across this boundary."
+            )
+
         if for_index and use_index:
             data_urls = self.get_parts(data_urls, for_index)
 
@@ -582,10 +592,17 @@ class Client:
         return (dict(**for_urls), dict(**for_index))
 
     def patch_stream(self, args):
-        # As of IFS Cycle 50r1, the 06/18 UTC runs are archived under stream=oper/wave
-        # rather than stream=scda/scwv. This new behaviour is used when source="ecmwf-testdata"
-        # until the operational upgrade is complete.
-        if self.source == "ecmwf-testdata":
+        # As of IFS Cycle 50r1 (operational from 2025-05-12), the 06/18 UTC runs are
+        # archived under stream=oper/wave rather than stream=scda/scwv.
+        # source="ecmwf-testdata" always uses the new structure.
+        # All other sources use the new structure for dates >= 2025-05-12 and the
+        # old structure for earlier dates, allowing requests that span the boundary.
+        IFS_50R1_DATE = datetime.date(2025, 5, 12)
+
+        request_date = datetime.datetime.strptime(args["_yyyymmdd"], "%Y%m%d").date()
+
+        if self.source == "ecmwf-testdata" or request_date >= IFS_50R1_DATE:
+            # New structure: 06/18 runs stay under oper/wave
             URL_STREAM_MAPPING = {
                 ("oper", "ef"): "enfo",
                 ("wave", "ef"): "waef",
@@ -593,6 +610,7 @@ class Client:
                 ("wave", "ep"): "waef",
             }
         else:
+            # Old structure: 06/18 runs mapped to scda/scwv
             URL_STREAM_MAPPING = {
                 ("oper", "06"): "scda",
                 ("oper", "18"): "scda",
