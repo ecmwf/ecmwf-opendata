@@ -582,10 +582,17 @@ class Client:
         return (dict(**for_urls), dict(**for_index))
 
     def patch_stream(self, args):
-        # As of IFS Cycle 50r1, the 06/18 UTC runs are archived under stream=oper/wave
-        # rather than stream=scda/scwv. This new behaviour is used when source="ecmwf-testdata"
-        # until the operational upgrade is complete.
-        if self.source == "ecmwf-testdata":
+        # As of IFS Cycle 50r1 (operational from 2025-05-12), the 06/18 UTC runs are
+        # archived under stream=oper/wave rather than stream=scda/scwv.
+        # source="ecmwf-testdata" always uses the new structure.
+        # All other sources use the new structure for dates >= 2025-05-12 and the
+        # old structure for earlier dates, allowing requests that span the boundary.
+        IFS_50R1_DATE = datetime.date(2025, 5, 12)
+
+        request_date = datetime.datetime.strptime(args["_yyyymmdd"], "%Y%m%d").date()
+
+        if self.source == "ecmwf-testdata" or request_date >= IFS_50R1_DATE:
+            # New structure: 06/18 runs stay under oper/wave
             URL_STREAM_MAPPING = {
                 ("oper", "ef"): "enfo",
                 ("wave", "ef"): "waef",
@@ -593,6 +600,7 @@ class Client:
                 ("wave", "ep"): "waef",
             }
         else:
+            # Old structure: 06/18 runs mapped to scda/scwv
             URL_STREAM_MAPPING = {
                 ("oper", "06"): "scda",
                 ("oper", "18"): "scda",
