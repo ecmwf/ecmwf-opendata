@@ -13,11 +13,11 @@ import itertools
 import json
 import logging
 import os
-import requests
-
 from collections import defaultdict
-from multiurl import download, robust
 from typing import Optional
+
+import requests
+from multiurl import download, robust
 
 from .date import (
     canonical_time,
@@ -28,8 +28,7 @@ from .date import (
     full_date,
 )
 from .sources import source_factory
-from .utils import warning_once, _show_attribution_message
-
+from .utils import _show_attribution_message, warning_once
 
 LOG = logging.getLogger(__name__)
 
@@ -75,12 +74,12 @@ class Client:
         sas_known_key="ecmwf",
         sas_custom_url=None,
         source_accept_ranges=None,
-        source_accept_multiple_ranges=None
+        source_accept_multiple_ranges=None,
     ):
         self.source = source_factory(
             name=source,
             accept_ranges=source_accept_ranges,
-            accept_multiple_ranges=source_accept_multiple_ranges
+            accept_multiple_ranges=source_accept_multiple_ranges,
         )
         self.model = model
         self.resol = resol
@@ -132,7 +131,7 @@ class Client:
         request: Optional[dict] = None,
         target: Optional[str] = None,
         use_index: bool = False,
-        **kwargs
+        **kwargs,
     ) -> Result:
         result = self._get_urls(request, target=target, use_index=use_index, **kwargs)
         if self.use_sas_token:
@@ -144,7 +143,7 @@ class Client:
             verify=self.verify,
             session=self.session,
             accept_ranges=self.source.accept_ranges,
-            accept_multiple_ranges=self.source.accept_multiple_ranges
+            accept_multiple_ranges=self.source.accept_multiple_ranges,
         )
         _show_attribution_message()
         return result

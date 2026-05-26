@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
+
 from .urls import URLS
-from .utils import warning_once
 
 
 @dataclass
@@ -13,9 +13,7 @@ class Source:
 
 
 def source_factory(
-    name: str,
-    accept_ranges: Optional[bool],
-    accept_multiple_ranges: Optional[bool]
+    name: str, accept_ranges: Optional[bool], accept_multiple_ranges: Optional[bool]
 ) -> Source:
     """Create a Source instance for the given name or URL.
 
@@ -48,10 +46,7 @@ def source_factory(
         # special case: cloud storages do not allow for multiple ranges
         if name in ["aws", "azure", "google"]:
             source = Source(
-                name=name,
-                url=url,
-                accept_ranges=True,
-                accept_multiple_ranges=False
+                name=name, url=url, accept_ranges=True, accept_multiple_ranges=False
             )
 
         # standard case: multiurl infers range request support from response headers
