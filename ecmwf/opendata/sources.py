@@ -58,14 +58,8 @@ def source_factory(
         else:
             source = Source(name=name, url=url)
 
-    # special case: provided name is an url
+    # special case: provided name is a custom url
     elif name.startswith("http://") or name.startswith("https://"):
-        warning_once(
-            "Unknown source %r. Known sources are %r",
-            name,
-            list(URLS.keys()),
-            did_you_mean=(name, list(URLS.keys())),
-        )
         source = Source(url=name)
     else:
         raise ValueError("Unknown source %r" % (name,))

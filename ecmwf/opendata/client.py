@@ -123,6 +123,10 @@ class Client:
             self.session.get = self._get_with_sas
             self.session.head = self._head_with_sas
 
+    @property
+    def url(self):
+        return self.source.url
+
     def _download(
         self,
         request: Optional[dict] = None,
