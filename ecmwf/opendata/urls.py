@@ -14,12 +14,12 @@ import os
 DOT_ECMWF_OPENDATA = os.path.expanduser("~/.ecmwf-opendata")
 
 URLS = {
-    "ecmwf": "https://data.ecmwf.int/forecasts",
-    "azure": "https://ai4edataeuwest.blob.core.windows.net/ecmwf",
     "aws": "https://ecmwf-forecasts.s3.eu-central-1.amazonaws.com",
+    "azure": "https://ai4edataeuwest.blob.core.windows.net/ecmwf",
+    "ecmwf": "https://data.ecmwf.int/forecasts",
     "ecmwf-esuites": "https://xdiss.ecmwf.int/ecpds/home/opendata",
-    "google": "https://storage.googleapis.com/ecmwf-open-data",
     "ecmwf-testdata": "https://data.ecmwf.int/forecasts/testdata",
+    "google": "https://storage.googleapis.com/ecmwf-open-data",
 }
 
 if os.path.exists(DOT_ECMWF_OPENDATA):

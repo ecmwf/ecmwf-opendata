@@ -1,3 +1,5 @@
+import pytest
+
 from ecmwf.opendata import Client
 
 
@@ -56,6 +58,7 @@ def test_stream_legacy():
     assert patch_stream("scwv", 18, "ep") == "waef"
 
 
+@pytest.mark.skip(reason="ecmwf-testdata source is no longer available")
 def test_stream_50r1():
     """IFS Cycle 50r1 behaviour (source='ecmwf-testdata'): 06/18 UTC runs remain
     under stream=oper/wave, with no scda/scwv streams."""

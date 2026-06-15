@@ -14,6 +14,7 @@ import json
 import logging
 import os
 from collections import defaultdict
+from typing import Optional
 
 import requests
 from multiurl import download, robust
@@ -26,7 +27,8 @@ from .date import (
     expand_time,
     full_date,
 )
-from .urls import URLS
+from .sources import source_factory
+from .utils import _show_attribution_message, warning_once
 
 LOG = logging.getLogger(__name__)
 
@@ -43,63 +45,6 @@ MONTHLY_PATTERN = (
 PATTERNS = {"mmsa": MONTHLY_PATTERN}
 EXTENSIONS = {"tf": "bufr"}
 
-ONCE = set()
-
-_ATTRIBUTION_SHOWN = False  # module-level guard to avoid spamming
-
-
-def _show_attribution_message():
-    global _ATTRIBUTION_SHOWN
-    if not _ATTRIBUTION_SHOWN:
-        print(
-            "By downloading data from the ECMWF open data dataset, you agree to "
-            "the terms: Attribution 4.0 International (CC BY 4.0). Please "
-            "attribute ECMWF when downloading this data."
-        )
-        _ATTRIBUTION_SHOWN = True
-
-
-def warning_once(*args, did_you_mean=None):
-    if repr(args) in ONCE:
-        return
-
-    LOG.warning(*args)
-
-    ONCE.add(repr(args))
-
-    if did_you_mean:
-        words, vocabulary = did_you_mean
-
-        def levenshtein(a, b):
-            if len(a) == 0:
-                return len(b)
-
-            if len(b) == 0:
-                return len(a)
-
-            if a[0].lower() == b[0].lower():
-                return levenshtein(a[1:], b[1:])
-
-            return 1 + min(
-                [
-                    levenshtein(a[1:], b[1:]),
-                    levenshtein(a[1:], b),
-                    levenshtein(a, b[1:]),
-                ]
-            )
-
-        if not isinstance(words, (list, tuple)):
-            words = [words]
-
-        for word in words:
-            distance, best = min((levenshtein(word, w), w) for w in vocabulary)
-            if distance < min(len(word), len(best)):
-                LOG.warning(
-                    "Did you mean %r instead of %r?",
-                    best,
-                    word,
-                )
-
 
 class Result:
     def __init__(self, urls, target, dates, for_urls, for_index):
@@ -111,6 +56,7 @@ class Result:
             self.datetime = dates
         self.for_urls = for_urls
         self.for_index = for_index
+        self.size = None
 
 
 class Client:
@@ -127,9 +73,14 @@ class Client:
         use_sas_token=None,
         sas_known_key="ecmwf",
         sas_custom_url=None,
+        source_accept_ranges=None,
+        source_accept_multiple_ranges=None,
     ):
-        self._url = None
-        self.source = source
+        self.source = source_factory(
+            name=source,
+            accept_ranges=source_accept_ranges,
+            accept_multiple_ranges=source_accept_multiple_ranges,
+        )
         self.model = model
         self.resol = resol
         self.beta = beta
@@ -173,50 +124,35 @@ class Client:
 
     @property
     def url(self):
-        if self._url is None:
-            if self.source.startswith("http://") or self.source.startswith("https://"):
-                self._url = self.source
-            else:
-                if self.source not in URLS:
-                    warning_once(
-                        "Unknown source %r. Known sources are %r",
-                        self.source,
-                        list(URLS.keys()),
-                        did_you_mean=(self.source, list(URLS.keys())),
-                    )
-                    raise ValueError("Unknown source %r" % (self.source,))
-                self._url = URLS[self.source]
+        return self.source.url
 
-        return self._url
+    def _download(
+        self,
+        request: Optional[dict] = None,
+        target: Optional[str] = None,
+        use_index: bool = False,
+        **kwargs,
+    ) -> Result:
+        result = self._get_urls(request, target=target, use_index=use_index, **kwargs)
+        if self.use_sas_token:
+            result.urls = self._apply_sas_to_urls(result.urls)
+
+        result.size = download(
+            result.urls,
+            target=result.target,
+            verify=self.verify,
+            session=self.session,
+            accept_ranges=self.source.accept_ranges,
+            accept_multiple_ranges=self.source.accept_multiple_ranges,
+        )
+        _show_attribution_message()
+        return result
 
     def retrieve(self, request=None, target=None, **kwargs):
-        result = self._get_urls(request, target=target, use_index=True, **kwargs)
-
-        if self.use_sas_token:
-            result.urls = self._apply_sas_to_urls(result.urls)
-        result.size = download(
-            result.urls,
-            target=result.target,
-            verify=self.verify,
-            session=self.session,
-        )
-        _show_attribution_message()
-        return result
+        return self._download(request, target=target, use_index=True, **kwargs)
 
     def download(self, request=None, target=None, **kwargs):
-        result = self._get_urls(request, target=target, use_index=False, **kwargs)
-
-        if self.use_sas_token:
-            result.urls = self._apply_sas_to_urls(result.urls)
-
-        result.size = download(
-            result.urls,
-            target=result.target,
-            verify=self.verify,
-            session=self.session,
-        )
-        _show_attribution_message()
-        return result
+        return self._download(request, target=target, use_index=False, **kwargs)
 
     def latest(self, request=None, **kwargs):
         if request is None:
@@ -265,7 +201,7 @@ class Client:
 
         for_urls, for_index = self.prepare_request(params)
 
-        for_urls["_url"] = [self.url]
+        for_urls["_url"] = [self.source.url]
 
         seen = set()
         data_urls = []
