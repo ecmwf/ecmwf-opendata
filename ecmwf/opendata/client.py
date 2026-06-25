@@ -75,6 +75,8 @@ class Client:
         sas_custom_url=None,
         source_accept_ranges=None,
         source_accept_multiple_ranges=None,
+        maximum_retries=500,
+        retry_after=120,
     ):
         self.source = source_factory(
             name=source,
@@ -88,6 +90,8 @@ class Client:
         self.infer_stream_keyword = infer_stream_keyword
         self.session = requests.Session()
         self.verify = verify
+        self.maximum_retries = maximum_retries
+        self.retry_after = retry_after
 
         if source == "ecmwf":
             warning_once(
@@ -126,14 +130,7 @@ class Client:
     def url(self):
         return self.source.url
 
-    def _download(
-        self,
-        request: Optional[dict] = None,
-        target: Optional[str] = None,
-        use_index: bool = False,
-        **kwargs,
-    ) -> Result:
-        result = self._get_urls(request, target=target, use_index=use_index, **kwargs)
+    def _download(self, result: Result) -> Result:
         if self.use_sas_token:
             result.urls = self._apply_sas_to_urls(result.urls)
 
@@ -144,15 +141,24 @@ class Client:
             session=self.session,
             accept_ranges=self.source.accept_ranges,
             accept_multiple_ranges=self.source.accept_multiple_ranges,
+            maximum_retries=self.maximum_retries,
+            retry_after=self.retry_after,
         )
         _show_attribution_message()
         return result
 
+    def _robust(self, call):
+        return robust(call, self.maximum_retries, self.retry_after)
+
     def retrieve(self, request=None, target=None, **kwargs):
-        return self._download(request, target=target, use_index=True, **kwargs)
+        result = self._get_urls(request, target=target, use_index=True, **kwargs)
+        result = self._download(result)
+        return result
 
     def download(self, request=None, target=None, **kwargs):
-        return self._download(request, target=target, use_index=False, **kwargs)
+        result = self._get_urls(request, target=target, use_index=False, **kwargs)
+        result = self._download(result)
+        return result
 
     def latest(self, request=None, **kwargs):
         if request is None:
@@ -186,7 +192,13 @@ class Client:
 
         raise ValueError("Cannot establish latest date for %r" % (result.for_urls,))
 
-    def _get_urls(self, request=None, use_index=None, target=None, **kwargs):
+    def _get_urls(
+        self,
+        request: Optional[dict] = None,
+        use_index: bool = False,
+        target: Optional[str] = None,
+        **kwargs
+    ) -> Result:
         assert use_index in (True, False)
         if request is None:
             params = dict(**kwargs)
@@ -265,7 +277,7 @@ class Client:
         for url in data_urls:
             base, _ = os.path.splitext(url)
             index_url = f"{base}.index"
-            r = robust(self.session.get)(index_url, verify=self.verify)
+            r = self._robust(self.session.get)(index_url, verify=self.verify)
             r.raise_for_status()
 
             parts = []
