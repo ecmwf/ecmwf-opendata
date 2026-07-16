@@ -341,9 +341,10 @@ class Client:
         else:
             params = dict(**request)
 
-        # If model is in the retireve overwrite the client model
-        # Warn user if client model does not match the model in retrieve
         if "model" in params:
+            # If model is in the retireve overwrite the client model
+            # Warn user if client model does not match the model in retrieve
+            # Takes precedence over class-based model derivation
             if self.model != params["model"]:
                 warning_once(
                     "Model %r does not match the client model %r, using model %r from retrieve",
@@ -353,13 +354,23 @@ class Client:
                     did_you_mean=(params["model"], self.model),
                 )
             model = params["model"]
-        else:
-            model = self.model
-
-        if "class" in params:
+        elif "class" in params:
+            # If model is implied by class, overwrite the client model
+            # Warn user if client model does not match the model from class
             model = {"od": "ifs", "ai": "aifs-single", "aifs-ens": "aifs-ens"}[
                 params["class"]
             ]
+            if self.model != model:
+                warning_once(
+                    "Model %r derived from class %r does not match the client model %r, using model %r",
+                    model,
+                    params["class"],
+                    self.model,
+                    model,
+                    did_you_mean=(model, self.model),
+                )
+        else:
+            model = self.model
 
         # Default stream for aifs-ens is enfo as this model only has ensemble forecasts
         if model == "aifs-ens":
