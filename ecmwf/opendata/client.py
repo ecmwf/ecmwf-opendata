@@ -204,7 +204,7 @@ class Client:
         request: Optional[dict] = None,
         use_index: bool = False,
         target: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> Result:
         assert use_index in (True, False)
         if request is None:
