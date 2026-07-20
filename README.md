@@ -731,6 +731,38 @@ client.retrieve(
 
 By downloading data from the ECMWF open data dataset, you agree to the terms: Attribution 4.0 International (CC BY 4.0). If you do not agree with such terms, do not download the data. Visit [this page](https://apps.ecmwf.int/datasets/licences/general/) for more information.
 
+## Retry policy
+
+The client automatically retries failed requests on transient HTTP errors (429, 500, 502, 503, 504, 408) and connection errors. You can configure the retry behaviour:
+
+```python
+from ecmwf.opendata import Client
+
+client = Client(
+    source="ecmwf",
+    maximum_retries=500,          # Maximum number of retry attempts (default: 500)
+    retry_after=120,              # Seconds to wait between retries (default: 120)
+    use_server_retry_after=True,  # Honour the server's Retry-After header (default: True)
+)
+```
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `maximum_retries` | 500 | Maximum number of retry attempts before giving up |
+| `retry_after` | 120 | Fallback wait time in seconds between retries |
+| `use_server_retry_after` | True | If the server responds with a `Retry-After` header (e.g. on HTTP 429), use that value instead of `retry_after` |
+
+When `use_server_retry_after=True` (the default), the client respects rate-limiting signals from the server. If the server does not provide a `Retry-After` header, the `retry_after` value is used as a fallback.
+
+The `retry_after` parameter also accepts a tuple `(min, max, ratio)` for incremental backoff:
+
+```python
+client = Client(
+    source="ecmwf",
+    retry_after=(10, 300, 2),  # Start at 10s, double each time, cap at 300s
+)
+```
+
 ### License
 
 [Apache License 2.0](LICENSE) In applying this licence, ECMWF does not waive the privileges and immunities
