@@ -9,7 +9,8 @@
 
 
 from .client import Client
+from .diss import DissClient
 
 __version__ = "0.3.30"
 
-__all__ = ["Client"]
+__all__ = ["Client", "DissClient"]

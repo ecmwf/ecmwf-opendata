@@ -75,7 +75,28 @@ class Client:
         sas_custom_url=None,
         source_accept_ranges=None,
         source_accept_multiple_ranges=None,
+        # DISS-specific options (only used when source="diss")
+        username=None,
+        password=None,
     ):
+        if debug:
+            pkg_logger = logging.getLogger("ecmwf.opendata")
+            pkg_logger.setLevel(logging.DEBUG)
+            if not pkg_logger.handlers:
+                pkg_logger.addHandler(logging.StreamHandler())
+
+        # DISS delegation: if source="diss", create a DissClient internally
+        self._is_diss = source == "diss"
+        if self._is_diss:
+            from .diss import DissClient
+
+            self._diss = DissClient(
+                username=username,
+                password=password,
+                verify=verify,
+            )
+            return
+
         self.source = source_factory(
             name=source,
             accept_ranges=source_accept_ranges,
@@ -109,9 +130,6 @@ class Client:
 
         self.sas_token = None
 
-        if debug:
-            logging.basicConfig(level=logging.DEBUG)
-
         if self.use_sas_token:
             self.sas_token = self._get_azure_sas_token(
                 known_key=sas_known_key,
@@ -124,6 +142,8 @@ class Client:
 
     @property
     def url(self):
+        if self._is_diss:
+            return self._diss.base_url
         return self.source.url
 
     def _download(
@@ -149,12 +169,36 @@ class Client:
         return result
 
     def retrieve(self, request=None, target=None, **kwargs):
+        if self._is_diss:
+            raise NotImplementedError(
+                "retrieve() is not supported for source='diss' (no index files available). "
+                "Use download() instead with file_type, step, and date arguments."
+            )
         return self._download(request, target=target, use_index=True, **kwargs)
 
     def download(self, request=None, target=None, **kwargs):
+        if self._is_diss:
+            return self._diss.download(target=target, **kwargs)
         return self._download(request, target=target, use_index=False, **kwargs)
 
+    def list_files(self, date, file_type=None):
+        """List available files on DISS for a given date.
+
+        Only available when source='diss'.
+        """
+        if not self._is_diss:
+            raise NotImplementedError(
+                "list_files() is only available for source='diss'."
+            )
+        return self._diss.list_files(date, file_type=file_type)
+
     def latest(self, request=None, **kwargs):
+        if self._is_diss:
+            raise NotImplementedError(
+                "latest() is not supported for source='diss'. "
+                "Use list_files() to check available dates."
+            )
+
         if request is None:
             params = dict(**kwargs)
         else:
