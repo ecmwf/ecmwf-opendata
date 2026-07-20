@@ -77,6 +77,7 @@ class Client:
         source_accept_multiple_ranges=None,
         maximum_retries=500,
         retry_after=120,
+        use_server_retry_after=True,
     ):
         self.source = source_factory(
             name=source,
@@ -92,6 +93,7 @@ class Client:
         self.verify = verify
         self.maximum_retries = maximum_retries
         self.retry_after = retry_after
+        self.use_server_retry_after = use_server_retry_after
 
         if source == "ecmwf":
             warning_once(
@@ -148,7 +150,12 @@ class Client:
         return result
 
     def _robust(self, call):
-        return robust(call, self.maximum_retries, self.retry_after)
+        return robust(
+            call,
+            self.maximum_retries,
+            self.retry_after,
+            use_server_retry_after=self.use_server_retry_after,
+        )
 
     def retrieve(self, request=None, target=None, **kwargs):
         result = self._get_urls(request, target=target, use_index=True, **kwargs)
@@ -183,7 +190,7 @@ class Client:
                 **params,
             )
             codes = [
-                robust(self.session.head)(url, verify=self.verify).status_code
+                self._robust(self.session.head)(url, verify=self.verify).status_code
                 for url in result.urls
             ]
             if len(codes) > 0 and all(c == 200 for c in codes):
