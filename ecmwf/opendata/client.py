@@ -374,7 +374,7 @@ class Client:
 
         # Default stream for aifs-ens is enfo as this model only has ensemble forecasts
         if model == "aifs-ens":
-            params["stream"] = "enfo"
+            params.setdefault("stream", "enfo")
 
         DEFAULTS_FC = dict(
             model=model,

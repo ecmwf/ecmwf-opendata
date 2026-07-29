@@ -33,19 +33,33 @@ def test_explicit_model_not_overridden_by_class():
     """
     client = Client(model="ifs")
 
-    # Explicit model="aifs-ens" should trigger stream="enfo" default,
-    # even when class="od" (which maps to "ifs") is also provided.
     for_urls, _ = client.prepare_request(model="aifs-ens", **{"class": "od"})
     assert for_urls["model"] == ["aifs-ens"]
     assert for_urls["stream"] == ["enfo"]
 
-    # When only class is provided (no explicit model), class should derive the model
     for_urls, _ = client.prepare_request(**{"class": "ai"})
     assert for_urls["model"] == ["aifs-single"]
 
-    # When neither model nor class is provided, client default should be used
     for_urls, _ = client.prepare_request(step=0)
     assert for_urls["model"] == ["ifs"]
+
+
+def test_aifs_ens_respects_explicit_stream():
+    """Test that an explicit stream for aifs-ens is respected.
+
+    Previously passing model="aifs-ens" always forced stream="enfo",
+    so the wave ensemble (stream="waef") could not be requested: the
+    request silently resolved to the enfo file instead.
+    """
+    client = Client(model="aifs-ens")
+
+    # Explicit stream="waef" should be honoured, not overwritten to enfo
+    for_urls, _ = client.prepare_request(stream="waef", type="cf", step=24)
+    assert for_urls["stream"] == ["waef"]
+
+    # With no stream given, aifs-ens should still default to enfo
+    for_urls, _ = client.prepare_request(type="cf", step=24)
+    assert for_urls["stream"] == ["enfo"]
 
 
 if __name__ == "__main__":
