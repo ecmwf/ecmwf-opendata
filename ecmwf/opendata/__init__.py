@@ -8,8 +8,8 @@
 #
 
 
-from .client import Client
+from .client import Client, MissingIndexEntriesError
 
 __version__ = "0.3.34"
 
-__all__ = ["Client"]
+__all__ = ["Client", "MissingIndexEntriesError"]

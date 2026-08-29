@@ -59,6 +59,19 @@ class Result:
         self.size = None
 
 
+class MissingIndexEntriesError(ValueError):
+    """Raised when a strict retrieval request has missing index entries."""
+
+    def __init__(self, missing_combinations):
+        self.missing_combinations = tuple(
+            dict(combination) for combination in missing_combinations
+        )
+        message = "Missing index entries for requested combinations: %s" % (
+            ", ".join(repr(combination) for combination in self.missing_combinations),
+        )
+        super().__init__(message)
+
+
 class Client:
     def __init__(
         self,
@@ -157,8 +170,14 @@ class Client:
             use_server_retry_after=self.use_server_retry_after,
         )
 
-    def retrieve(self, request=None, target=None, **kwargs):
-        result = self._get_urls(request, target=target, use_index=True, **kwargs)
+    def retrieve(self, request=None, target=None, *, require_all=False, **kwargs):
+        result = self._get_urls(
+            request,
+            target=target,
+            use_index=True,
+            require_all=require_all,
+            **kwargs,
+        )
         result = self._download(result)
         return result
 
@@ -204,6 +223,7 @@ class Client:
         request: Optional[dict] = None,
         use_index: bool = False,
         target: Optional[str] = None,
+        require_all: bool = False,
         **kwargs,
     ) -> Result:
         assert use_index in (True, False)
@@ -264,7 +284,11 @@ class Client:
             )
 
         if for_index and use_index:
-            data_urls = self.get_parts(data_urls, for_index)
+            data_urls = self.get_parts(
+                data_urls,
+                for_index,
+                require_all=require_all,
+            )
 
         return Result(
             urls=data_urls,
@@ -274,12 +298,13 @@ class Client:
             for_index=for_index,
         )
 
-    def get_parts(self, data_urls, for_index):
+    def get_parts(self, data_urls, for_index, require_all=False):
         count = len(for_index)
         result = []
         line = None
 
         possible_values = defaultdict(set)
+        matched_combinations = set()
 
         for url in data_urls:
             base, _ = os.path.splitext(url)
@@ -305,6 +330,9 @@ class Client:
 
                 if len(matches) == count:
                     parts.append((tuple(matches), (line["_offset"], line["_length"])))
+                    matched_combinations.add(
+                        tuple((name, line[name]) for name in for_index)
+                    )
 
             if parts:
                 result.append((url, tuple(p[1] for p in sorted(parts))))
@@ -318,6 +346,16 @@ class Client:
                     d,
                     did_you_mean=(d, possible_values[name]),
                 )
+
+        if require_all:
+            requested_combinations = itertools.product(*for_index.values())
+            missing_combinations = [
+                tuple(zip(for_index, combination))
+                for combination in requested_combinations
+                if tuple(zip(for_index, combination)) not in matched_combinations
+            ]
+            if missing_combinations:
+                raise MissingIndexEntriesError(missing_combinations)
 
         if not result:
             raise ValueError("Cannot find index entries matching %r" % (for_index,))

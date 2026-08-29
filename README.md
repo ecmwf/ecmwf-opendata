@@ -110,6 +110,12 @@ client.retrieve(
 )
 ```
 
+By default, a request downloads every matching field and warns when an
+individual requested index value is unavailable. To reject a partial result,
+pass `require_all=True`. The client then raises
+`MissingIndexEntriesError` before downloading if any requested combination of
+index keywords, such as parameter, step, level, or ensemble member, is absent.
+
 The `date` and `time` keyword are used to select the date and time of the forecast run (see [Date and time](#date-and-time) below). If `date` or both `date` and `time` are not specified, the library will query the server for the most recent matching data. The `date` and `time` of the downloaded forecast is returned by the `retrieve()` method.
 
 ```python
