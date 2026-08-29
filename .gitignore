@@ -147,3 +147,4 @@ done
 *.raw
 ?.*
 TODO
+.goals/
