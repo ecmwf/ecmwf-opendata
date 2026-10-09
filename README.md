@@ -53,7 +53,7 @@ where:
 
 - `model` is the name of the model that produced the data. Use `ifs` for the physics-driven model, `aifs-single` for the data-driven model, and `aifs-ens` for the ensemble data-driven model. Default is `ifs`.
 
-- `resol` specifies the resolution of the data. Default is `0p25` for 0.25 degree resolution, and is the only resolution that is currently available.
+- `resol` specifies the default resolution of the data. Possible values are `0p25` for 0.25 degree resolution and `0p1` for 0.1 degree resolution. Default is `0p25`. The resolution can also be set for an individual request with the `resol` keyword, see [Resolution](#resolution).
 
 - `preserve_request_order`. If this flag is set to `True`, the library will attempt to write the retrieved data into the target file in the order specified by the request. For example, if the request specifies `param=[2t,msl]` the library will ensure that the field `2t` is first in the target file, while with `param=[msl,2t]`, the field `msl` will be first. This also works across different keywords: `...,levelist=[500,100],param=[z,t],...` will produce different output to `...,param=[z,t],levelist=[500,100],...`
 If the flag is set to `False`, the library will sort the request to minimise the number of HTTP requests made to the server, leading to faster download speeds. Default is `False`.
@@ -149,6 +149,8 @@ client.download(
 
 ```
 
+> 📌 **NOTE**: At `resol="0p1"` the data is split into a single level file and a pressure level file. `Client.download()` downloads both files into the target unless `levtype` is given, see [Resolution](#resolution).
+
 > `Client.latest()`
 
 The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forecast without downloading the data:
@@ -179,11 +181,12 @@ The supported keywords are:
 - `date`: the date at which the forecast starts.
 - `time`: the time at which the forecast starts.
 - `step`: the forecast time step in hours, or `fcmonth`, the time step in months for the seasonal forecast (compulsory, default to `0` and `1`, respectively).
+- `resol`: the resolution of the data, `0p25` or `0p1` (defaults to the `resol` given to the `Client`, see [Resolution](#resolution)).
 
 and (all optional, with no defaults):
 
 - `param`: the meteorological parameters, such as wind, pressure or humidity.
-- `levtype`: select between single level parameters and parameters on pressure levels.
+- `levtype`: select between single level parameters (`sfc`), parameters on pressure levels (`pl`) and soil levels (`sol`). At `resol="0p1"` it is also used to select which file to access.
 - `levelist`: the list of pressure levels when relevant.
 - `number`: the list of ensemble member numbers when relevant.
 
@@ -384,6 +387,38 @@ To select a time step, use the `step` keyword:
 
 > 📌 **NOTE**: Not specifying `step` will return all available time steps.
 
+### Resolution
+
+The data is available at two resolutions, selected with the `resol` keyword:
+
+| `resol` | Grid | Models |
+| ------- | ---- | ------ |
+| `0p25` (default) | 0.25° x 0.25° | `ifs`, `aifs-single`, `aifs-ens` |
+| `0p1` | 0.1° x 0.1° | `ifs` |
+
+The `0p1` resolution is only available for the `ifs` model. Requesting it with `model="aifs-single"` or `model="aifs-ens"` raises an error.
+
+The resolution can be set when creating the client, or for an individual request. A value given in the request takes precedence over the client value:
+
+```python
+client = Client(source="ecmwf")  # resol="0p25" by default
+
+client.retrieve(
+   resol="0p1",
+   param="2t",
+   step=24,
+   target="data.grib2",
+)
+```
+
+At `0p25`, all the fields of a forecast step are in a single file. At `0p1`, they are split into two files: one for single level fields (`sfc`) and one for pressure level fields (`pl`). The library handles this for you:
+
+- if `levtype` is not given, both files are used, so a request returns the same fields at `0p1` as it would at `0p25`;
+- if `levtype="sfc"` or `levtype="pl"` is given, only the matching file is used, which reduces the number of HTTP requests. The soil level fields (`levtype="sol"`) are in the `sfc` file;
+- the ocean wave streams (`wave` and `waef`) only have single level fields, so only the `sfc` file is used.
+
+> 📌 **NOTE**: The tropical cyclone tracks (`type="tf"`) do not depend on resolution, and are always retrieved from the `0p25` files.
+
 ### Parameters and levels
 
 To select a parameter, use the `param` keyword:
@@ -412,10 +447,10 @@ for pressure level parameters, use the `levelist` keyword:
 
 | List of pressure levels (hPa) |
 | ----------------------------- |
-|   1000, 925, 850, 700, 500, 300, 250, 200 and 50 |
+|   1000, 925, 850, 700, 600, 500, 400, 300, 250, 200, 150, 100, 50 and 10 |
 
 
-Below is the list of all parameters:
+Below is the list of all parameters. The parameters marked with ¹ are only available in the HRES forecast (`stream="oper"`), the others are available in both the HRES and ENS forecasts. Some parameters, such as the 6-hourly maximum and minimum temperatures, are only available at some time steps.
 
 > Atmospheric fields on pressure levels
 
@@ -429,32 +464,80 @@ Below is the list of all parameters:
 | u | U component of wind | m s<sup>-1</sup> |
 | v | V component of wind | m s<sup>-1</sup> |
 | vo | Vorticity (relative) | s<sup>-1</sup> |
+| w | Vertical velocity | Pa s<sup>-1</sup> |
+| z ¹ | Geopotential | m<sup>2</sup> s<sup>-2</sup> |
 
 > Atmospheric fields on a single level
 
 | Parameter | Description | Units |
 | --------- | ----------- | ----- |
+| 100u | 100 metre U wind component | m s<sup>-1</sup> |
+| 100v | 100 metre V wind component | m s<sup>-1</sup> |
+| 10fg | Maximum 10 metre wind gust since previous post-processing | m s<sup>-1</sup> |
+| 10fg3 | Maximum 10 metre wind gust in the last 3 hours | m s<sup>-1</sup> |
 | 10u | 10 metre U wind component | m s<sup>-1</sup> |
 | 10v | 10 metre V wind component | m s<sup>-1</sup> |
+| 2d | 2 metre dewpoint temperature | K |
 | 2t | 2 metre temperature | K |
+| asn | Snow albedo | (0 - 1) |
+| ewss | Time-integrated eastward turbulent surface stress | N m<sup>-2</sup> s |
+| lsm | Land-sea mask | (0 - 1) |
+| mn2t3 | Minimum temperature at 2 metres in the last 3 hours | K |
+| mn2t6 | Minimum temperature at 2 metres in the last 6 hours | K |
 | msl | Mean sea level pressure | Pa |
+| mucape | Most-unstable CAPE | J kg<sup>-1</sup> |
+| mx2t3 | Maximum temperature at 2 metres in the last 3 hours | K |
+| mx2t6 | Maximum temperature at 2 metres in the last 6 hours | K |
+| nsss | Time-integrated northward turbulent surface stress | N m<sup>-2</sup> s |
+| ptype | Precipitation type | (Code table 4.201) |
 | ro | Runoff | m |
+| rsn | Snow density | kg m<sup>-3</sup> |
+| sd | Snow depth | m of water equivalent |
+| sdor ¹ | Standard deviation of sub-gridscale orography | m |
+| sf | Snowfall | m of water equivalent |
+| sithick | Sea ice thickness | m |
 | skt | Skin temperature | K |
+| slor ¹ | Slope of sub-gridscale orography | Numeric |
 | sp | Surface pressure | Pa |
-| st | Soil Temperature | K |
-| stl1 | Soil temperature level 1 | K |
+| ssr | Surface net short-wave (solar) radiation | J m<sup>-2</sup> |
+| ssrd | Surface short-wave (solar) radiation downwards | J m<sup>-2</sup> |
+| str | Surface net long-wave (thermal) radiation | J m<sup>-2</sup> |
+| strd | Surface long-wave (thermal) radiation downwards | J m<sup>-2</sup> |
+| sve | Eastward surface sea water velocity | m s<sup>-1</sup> |
+| svn | Northward surface sea water velocity | m s<sup>-1</sup> |
+| tcc | Total cloud cover | (0 - 1) |
+| tcw | Total column water | kg m<sup>-2</sup> |
 | tcwv | Total column vertically-integrated water vapour | kg m<sup>-2</sup> |
-| tp | Total Precipitation | m |
+| tp | Total precipitation | m |
+| tprate | Total precipitation rate | kg m<sup>-2</sup> s<sup>-1</sup> |
+| ttr | Top net long-wave (thermal) radiation | J m<sup>-2</sup> |
+| z ¹ | Geopotential | m<sup>2</sup> s<sup>-2</sup> |
+| zos | Sea surface height | m |
+
+> Soil fields (`levtype="sol"`, `levelist` 1 to 4)
+
+| Parameter | Description | Units |
+| --------- | ----------- | ----- |
+| sot | Soil temperature | K |
+| vsw | Volumetric soil moisture | m<sup>3</sup> m<sup>-3</sup> |
 
 > Ocean waves fields
 
 | Parameter | Description | Units |
 | --------- | ----------- | ----- |
+| cdww | Coefficient of drag with waves | dimensionless |
+| h1012 | Significant wave height of all waves with periods within the inclusive range from 10 to 12 seconds | m |
+| h1214 | Significant wave height of all waves with periods within the inclusive range from 12 to 14 seconds | m |
+| h1417 | Significant wave height of all waves with periods within the inclusive range from 14 to 17 seconds | m |
+| h1721 | Significant wave height of all waves with periods within the inclusive range from 17 to 21 seconds | m |
+| h2125 | Significant wave height of all waves with periods within the inclusive range from 21 to 25 seconds | m |
+| h2530 | Significant wave height of all waves with periods within the inclusive range from 25 to 30 seconds | m |
 | mp2 | Mean zero-crossing wave period | s |
 | mwd | Mean wave direction | Degree true |
 | mwp | Mean wave period | s |
 | pp1d | Peak wave period | s |
 | swh | Significant height of combined wind waves and swell | m |
+| wmb | Model bathymetry | m |
 
 > Ensemble mean and standard deviation - pressure levels
 
@@ -547,6 +630,25 @@ client.retrieve(
     target="data.grib2",
 )
 ```
+
+### Download single level and pressure level parameters at 0.1 degree resolution from ECMWF's 00UTC HRES forecast
+
+```python
+from ecmwf.opendata import Client
+
+client = Client(source="ecmwf", resol="0p1")
+
+client.retrieve(
+    time=0,
+    stream="oper",
+    type="fc",
+    step=24,
+    param=["2t", "msl", "t"],
+    target="data.grib2",
+)
+```
+
+As `levtype` is not given, both the single level and pressure level files are accessed. To only access the pressure level file, add `levtype="pl"`.
 
 ### Download the tropical cyclone tracks from ECMWF's 00UTC HRES forecast
 
