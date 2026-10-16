@@ -34,16 +34,28 @@ LOG = logging.getLogger(__name__)
 
 HOURLY_PATTERN = (
     "{_url}/{_yyyymmdd}/{_H}z/{model}/{resol}/{_stream}/"
-    "{_yyyymmddHHMMSS}-{step}h-{_stream}-{type}.{_extension}"
+    "{_yyyymmddHHMMSS}-{step}h-{_stream}-{type}{_levfile}.{_extension}"
 )
 
 MONTHLY_PATTERN = (
     "{_url}/{_yyyymmdd}/{_H}z/{model}/{resol}/{_stream}/"
-    "{_yyyymmddHHMMSS}-{fcmonth}m-{_stream}-{type}.{_extension}"
+    "{_yyyymmddHHMMSS}-{fcmonth}m-{_stream}-{type}{_levfile}.{_extension}"
 )
 
 PATTERNS = {"mmsa": MONTHLY_PATTERN}
 EXTENSIONS = {"tf": "bufr"}
+
+# Resolutions whose GRIB files are split by level type into
+# "<name>-sfc.grib2" and "<name>-pl.grib2" instead of a single file
+SPLIT_RESOLUTIONS = {"0p1"}
+# Resolutions only produced by the IFS model
+IFS_ONLY_RESOLUTIONS = {"0p1"}
+# Soil level fields (levtype=sol) are disseminated with the single level fields
+LEVTYPE_FILES = {"sfc": "-sfc", "sol": "-sfc", "pl": "-pl"}
+# Wave streams only have single level fields, so there is no "-pl" file
+SFC_ONLY_STREAMS = {"wave", "waef", "scwv"}
+# Tropical cyclone tracks (BUFR) are only produced at the default resolution
+TF_RESOL = "0p25"
 
 
 class Result:
@@ -239,19 +251,25 @@ class Client:
             args["_extension"] = EXTENSIONS.get(args["type"], "grib2")
             args["_stream"] = self.patch_stream(args)
 
+            if args["type"] == "tf":
+                args["resol"] = TF_RESOL
+
+            resol = args["resol"]
+
             if self.beta:
                 # test data is put in an /experimental subdir after resol
                 # it is not part of a mars request, so we inject it here
                 args["resol"] += "/experimental"
 
-            url = pattern.format(**args)
+            for levfile in self.level_files(resol, args, for_index):
+                url = pattern.format(_levfile=levfile, **args)
 
-            if self.resol == "0p4-beta":
-                url = url.replace("/ifs/", "/")
+                if resol == "0p4-beta":
+                    url = url.replace("/ifs/", "/")
 
-            if url not in seen:
-                data_urls.append(url)
-                seen.add(url)
+                if url not in seen:
+                    data_urls.append(url)
+                    seen.add(url)
 
         IFS_50R1_DATE = datetime.datetime(2026, 5, 12)
         if any(d < IFS_50R1_DATE for d in dates):
@@ -273,6 +291,22 @@ class Client:
             for_urls=for_urls,
             for_index=for_index,
         )
+
+    def level_files(self, resol, args, for_index):
+        # Files at a split resolution are separated into single level ("-sfc")
+        # and pressure level ("-pl") files. If no levtype is requested, both are
+        # returned so that the result matches what the single file would contain.
+        if resol not in SPLIT_RESOLUTIONS or args["type"] == "tf":
+            return [""]
+
+        if args["_stream"] in SFC_ONLY_STREAMS:
+            return [LEVTYPE_FILES["sfc"]]
+
+        levtypes = [x for x in for_index.get("levtype", []) if x in LEVTYPE_FILES]
+        if not levtypes:
+            levtypes = ["sfc", "pl"]
+
+        return list(dict.fromkeys(LEVTYPE_FILES[x] for x in levtypes))
 
     def get_parts(self, data_urls, for_index):
         count = len(for_index)
@@ -391,6 +425,23 @@ class Client:
         else:
             model = self.model
 
+        if "resol" in params and params["resol"] != self.resol:
+            warning_once(
+                "Resolution %r does not match the client resolution %r, using resolution %r from retrieve",
+                params["resol"],
+                self.resol,
+                params["resol"],
+            )
+
+        resol = params.get("resol", self.resol)
+        if not isinstance(resol, (list, tuple)):
+            resol = str(resol).split("/")
+        if model != "ifs" and any(r in IFS_ONLY_RESOLUTIONS for r in resol):
+            raise ValueError(
+                "Resolution %r is only available for model 'ifs', not %r"
+                % ("/".join(resol), model)
+            )
+
         # Default stream for aifs-ens is enfo as this model only has ensemble forecasts
         if model == "aifs-ens":
             params.setdefault("stream", "enfo")
@@ -467,6 +518,7 @@ class Client:
         POSSIBLE_VALUES = {
             "type": ["tf", "fc", "fcmean", "cf", "pf", "em", "ep", "es"],
             "stream": ["oper", "wave", "scda", "scwv", "enfo", "waef", "mmsa"],
+            "resol": ["0p25", "0p1", "0p4-beta"],
         }
 
         defaults = DEFAULTS.get(params.get("stream"), DEFAULTS_FC)
@@ -567,7 +619,7 @@ class Client:
 
         request_date = datetime.datetime.strptime(args["_yyyymmdd"], "%Y%m%d").date()
 
-        if self.source == "ecmwf-testdata" or request_date >= IFS_50R1_DATE:
+        if self.source.name == "ecmwf-testdata" or request_date >= IFS_50R1_DATE:
             # New structure: 06/18 runs stay under oper/wave
             URL_STREAM_MAPPING = {
                 ("oper", "ef"): "enfo",
