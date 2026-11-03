@@ -54,8 +54,10 @@ IFS_ONLY_RESOLUTIONS = {"0p1"}
 LEVTYPE_FILES = {"sfc": "-sfc", "sol": "-sfc", "pl": "-pl"}
 # Wave streams only have single level fields, so there is no "-pl" file
 SFC_ONLY_STREAMS = {"wave", "waef", "scwv"}
-# Tropical cyclone tracks (BUFR) are only produced at the default resolution
+# Tropical cyclone tracks (BUFR) are not produced at 0p1: use 0p25 instead
+# (0p25 and 0p4-beta are left unchanged)
 TF_RESOL = "0p25"
+TF_UNSUPPORTED_RESOLUTIONS = {"0p1"}
 
 
 class Result:
@@ -251,7 +253,7 @@ class Client:
             args["_extension"] = EXTENSIONS.get(args["type"], "grib2")
             args["_stream"] = self.patch_stream(args)
 
-            if args["type"] == "tf":
+            if args["type"] == "tf" and args["resol"] in TF_UNSUPPORTED_RESOLUTIONS:
                 args["resol"] = TF_RESOL
 
             resol = args["resol"]

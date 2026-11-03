@@ -103,9 +103,46 @@ def test_0p1_06z_run():
     ]
 
 
-def test_tf_always_uses_0p25():
+def test_tf_at_0p1_uses_0p25():
     assert urls(Client(resol="0p1"), type="tf", step=240) == [
         f"{URL}/20261009/00z/ifs/0p25/oper/20261009000000-240h-oper-tf.bufr"
+    ]
+    assert urls(Client(), resol="0p1", type="tf", step=240) == [
+        f"{URL}/20261009/00z/ifs/0p25/oper/20261009000000-240h-oper-tf.bufr"
+    ]
+
+
+def test_tf_at_default_0p25_unchanged():
+    assert urls(Client(), type="tf", step=240) == [
+        f"{URL}/20261009/00z/ifs/0p25/oper/20261009000000-240h-oper-tf.bufr"
+    ]
+    assert urls(Client(resol="0p25"), type="tf", step=240) == [
+        f"{URL}/20261009/00z/ifs/0p25/oper/20261009000000-240h-oper-tf.bufr"
+    ]
+
+
+@pytest.mark.parametrize("from_client", [True, False])
+def test_tf_at_0p4_beta_aws(from_client):
+    if from_client:
+        client, kwargs = Client(source="aws", resol="0p4-beta"), {}
+    else:
+        client, kwargs = Client(source="aws"), {"resol": "0p4-beta"}
+    assert urls(
+        client, date="20230118", stream="oper", type="tf", step=240, **kwargs
+    ) == [
+        "https://ecmwf-forecasts.s3.eu-central-1.amazonaws.com/20230118/00z/"
+        "0p4-beta/oper/20230118000000-240h-oper-tf.bufr"
+    ]
+
+
+def test_tf_at_0p4_beta_azure():
+    # use_sas_token=False: avoid the network call to fetch a SAS token
+    client = Client(source="azure", resol="0p4-beta", use_sas_token=False)
+    assert urls(
+        client, date="20220310", time=12, stream="oper", type="tf", step=240
+    ) == [
+        "https://ai4edataeuwest.blob.core.windows.net/ecmwf/20220310/12z/"
+        "0p4-beta/oper/20220310120000-240h-oper-tf.bufr"
     ]
 
 
