@@ -127,7 +127,9 @@ def test_tf_at_0p4_beta_aws(from_client):
         client, kwargs = Client(source="aws", resol="0p4-beta"), {}
     else:
         client, kwargs = Client(source="aws"), {"resol": "0p4-beta"}
-    assert urls(client, date="20230118", stream="oper", type="tf", step=240, **kwargs) == [
+    assert urls(
+        client, date="20230118", stream="oper", type="tf", step=240, **kwargs
+    ) == [
         "https://ecmwf-forecasts.s3.eu-central-1.amazonaws.com/20230118/00z/"
         "0p4-beta/oper/20230118000000-240h-oper-tf.bufr"
     ]
