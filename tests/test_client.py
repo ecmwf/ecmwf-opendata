@@ -13,14 +13,14 @@ from ecmwf.opendata.client import Client, Result
 
 
 @pytest.mark.parametrize(
-    "source, model, forecast_type, stream",
+    "source, model, forecast_type, stream, disable_progress_bar",
     [
-        ("ecmwf", "aifs-single", "fc", "oper"),
-        ("azure", "aifs-single", "fc", "oper"),
-        ("aws", "aifs-single", "fc", "oper"),
-        ("ecmwf", "ifs", "ef", "enfo"),
-        ("azure", "ifs", "ef", "enfo"),
-        ("aws", "ifs", "ef", "enfo"),
+        ("ecmwf", "aifs-single", "fc", "oper", False),
+        ("azure", "aifs-single", "fc", "oper", True),
+        ("aws", "aifs-single", "fc", "oper", False),
+        ("ecmwf", "ifs", "ef", "enfo", True),
+        ("azure", "ifs", "ef", "enfo", False),
+        ("aws", "ifs", "ef", "enfo", True),
     ],
 )
 def test_ecmwf_opendata(
@@ -28,6 +28,7 @@ def test_ecmwf_opendata(
     model: str,
     forecast_type: str,
     stream: str,
+    disable_progress_bar: bool
 ) -> None:
     temporary_directory = tempfile.TemporaryDirectory(prefix="/tmp/")
     local_file_path = Path(
@@ -41,6 +42,7 @@ def test_ecmwf_opendata(
         step=list(range(0, 6, 6)),
         param=["2t"],
         target=local_file_path,
+        disable_progress_bar=disable_progress_bar,
         levelist=[],
         stream=stream,
     )
