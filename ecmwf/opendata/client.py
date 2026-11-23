@@ -182,6 +182,12 @@ class Client:
         return result
 
     def latest(self, request=None, use_index=True, **kwargs):
+        """Return the latest date with the requested files available.
+
+        By default, also check any index files needed by ``retrieve``. If an
+        index is unavailable, try an earlier run. Set ``use_index=False`` when
+        selecting a date for ``download``, which does not use index files.
+        """
         if request is None:
             params = dict(**kwargs)
         else:
