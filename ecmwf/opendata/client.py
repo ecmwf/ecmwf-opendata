@@ -181,7 +181,7 @@ class Client:
         result = self._download(result)
         return result
 
-    def latest(self, request=None, **kwargs):
+    def latest(self, request=None, use_index=True, **kwargs):
         if request is None:
             params = dict(**kwargs)
         else:
@@ -203,9 +203,14 @@ class Client:
                 date=date,
                 **params,
             )
+            urls = result.urls
+            if use_index:
+                urls = urls + [
+                    f"{os.path.splitext(url)[0]}.index" for url in result.urls
+                ]
             codes = [
                 self._robust(self.session.head)(url, verify=self.verify).status_code
-                for url in result.urls
+                for url in urls
             ]
             if len(codes) > 0 and all(c == 200 for c in codes):
                 return date
@@ -227,7 +232,7 @@ class Client:
             params = dict(**request)
 
         if "date" not in params:
-            params["date"] = self.latest(params)
+            params["date"] = self.latest(params, use_index=use_index)
 
         if target is None:
             target = params.pop("target", None)
