@@ -213,6 +213,7 @@ class Client:
                 self._robust(self.session.head)(url, verify=self.verify).status_code
                 for url in result.urls
             ]
+            # Only indexed retrieval needs the index, and only after its data files exist.
             if use_index and result.for_index and codes and all(c == 200 for c in codes):
                 codes.extend(
                     self._robust(self.session.head)(
