@@ -181,7 +181,13 @@ class Client:
         result = self._download(result)
         return result
 
-    def latest(self, request=None, **kwargs):
+    def latest(self, request=None, use_index=True, **kwargs):
+        """Return the latest date with the requested files available.
+
+        By default, also check any index files needed by ``retrieve``. If an
+        index is unavailable, try an earlier run. Set ``use_index=False`` when
+        selecting a date for ``download``, which does not use index files.
+        """
         if request is None:
             params = dict(**kwargs)
         else:
@@ -207,6 +213,15 @@ class Client:
                 self._robust(self.session.head)(url, verify=self.verify).status_code
                 for url in result.urls
             ]
+            # Only indexed retrieval needs the index, and only after its data files exist.
+            if use_index and result.for_index and codes and all(c == 200 for c in codes):
+                codes.extend(
+                    self._robust(self.session.head)(
+                        f"{os.path.splitext(url)[0]}.index",
+                        verify=self.verify,
+                    ).status_code
+                    for url in result.urls
+                )
             if len(codes) > 0 and all(c == 200 for c in codes):
                 return date
             date -= delta
@@ -227,7 +242,7 @@ class Client:
             params = dict(**request)
 
         if "date" not in params:
-            params["date"] = self.latest(params)
+            params["date"] = self.latest(params, use_index=use_index)
 
         if target is None:
             target = params.pop("target", None)
