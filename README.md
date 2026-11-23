@@ -153,7 +153,7 @@ client.download(
 
 > `Client.latest()`
 
-The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forecast without downloading the data. By default, it checks that both the forecast files and their `.index` files are available, so the date can be used with `Client.retrieve()`. Set `use_index=False` to check only the forecast files, as needed for `Client.download()`:
+The `Client.latest()` method takes the same parameters as the `Client.retrieve()` method, and returns the date of the most recent matching forecast without downloading the data. By default, it checks that the forecast files and any `.index` files needed by `Client.retrieve()` are available. Set `use_index=False` to check only the forecast files, as needed for `Client.download()`:
 
 ```python
 from ecmwf.opendata import Client
